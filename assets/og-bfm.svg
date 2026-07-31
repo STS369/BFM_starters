@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">BFM STARTER</title>
+  <desc id="desc">Range、Angles、Closureの3つの判断軸から学ぶ初心者向けBFM入門</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111b"/>
+      <stop offset="0.62" stop-color="#0b1c29"/>
+      <stop offset="1" stop-color="#123245"/>
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#6aa1b8" stroke-opacity=".08"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect x="70" y="62" width="1060" height="506" rx="24" fill="#081722" fill-opacity=".72" stroke="#274353"/>
+  <text x="110" y="116" fill="#59d6e8" font-family="Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="6">PART 01 / FUNDAMENTALS</text>
+  <text x="106" y="226" fill="#f4f8fa" font-family="Arial, sans-serif" font-size="82" font-weight="800">BFM STARTER</text>
+  <text x="110" y="286" fill="#c6d2d8" font-family="sans-serif" font-size="31">位置・角度・エネルギー。3つの判断軸から学ぶ。</text>
+  <g font-family="Arial, sans-serif">
+    <g transform="translate(110 356)">
+      <rect width="290" height="144" rx="12" fill="#0d1d2a" stroke="#2e5668"/>
+      <text x="24" y="36" fill="#59d6e8" font-size="15" font-weight="700" letter-spacing="3">01 / RANGE</text>
+      <text x="24" y="78" fill="#f4f8fa" font-size="27" font-weight="700">距離</text>
+      <text x="24" y="111" fill="#8297a2" font-size="16">近すぎないか、遠すぎないか</text>
+    </g>
+    <g transform="translate(420 356)">
+      <rect width="290" height="144" rx="12" fill="#0d1d2a" stroke="#2e5668"/>
+      <text x="24" y="36" fill="#59d6e8" font-size="15" font-weight="700" letter-spacing="3">02 / ANGLES</text>
+      <text x="24" y="78" fill="#f4f8fa" font-size="27" font-weight="700">角度</text>
+      <text x="24" y="111" fill="#8297a2" font-size="16">2機はどちらを向いているか</text>
+    </g>
+    <g transform="translate(730 356)">
+      <rect width="290" height="144" rx="12" fill="#0d1d2a" stroke="#2e5668"/>
+      <text x="24" y="36" fill="#f4a261" font-size="15" font-weight="700" letter-spacing="3">03 / CLOSURE</text>
+      <text x="24" y="78" fill="#f4f8fa" font-size="27" font-weight="700">接近率</text>
+      <text x="24" y="111" fill="#8297a2" font-size="16">距離はどの速さで変わるか</text>
+    </g>
+  </g>
+  <text x="110" y="542" fill="#8297a2" font-family="Arial, sans-serif" font-size="16" letter-spacing="2">CITED PUBLIC SOURCES / BEGINNER-FRIENDLY COMPARISON UI</text>
+</svg>

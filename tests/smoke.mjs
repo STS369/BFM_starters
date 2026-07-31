@@ -1,0 +1,911 @@
+/*
+ * Dependency-free browser smoke test for BFM STARTER.
+ *
+ * Usage:
+ * 1. Start Chrome with --headless=new --remote-debugging-port=9222
+ * 2. Start a local HTTP server for the project.
+ * 3. node tests/smoke.mjs http://127.0.0.1:4173/DogfightLecture/
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+import process from "node:process";
+
+const targetUrl = process.argv[2] ?? "http://127.0.0.1:4173/DogfightLecture/";
+const debuggerBase = process.env.CDP_URL ?? "http://127.0.0.1:9222";
+
+const results = [];
+const runtimeErrors = [];
+const consoleErrors = [];
+let nextId = 1;
+const pending = new Map();
+
+function record(name, pass, detail = "") {
+  results.push({ name, pass: Boolean(pass), detail: String(detail ?? "") });
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function createTarget() {
+  const response = await fetch(`${debuggerBase}/json/new?${encodeURIComponent(targetUrl)}`, { method: "PUT" });
+  if (!response.ok) throw new Error(`Could not create Chrome target: ${response.status}`);
+  return response.json();
+}
+
+function connect(webSocketUrl) {
+  return new Promise((resolve, reject) => {
+    const socket = new WebSocket(webSocketUrl);
+    socket.addEventListener("open", () => resolve(socket), { once: true });
+    socket.addEventListener("error", reject, { once: true });
+  });
+}
+
+function command(socket, method, params = {}) {
+  const id = nextId++;
+  socket.send(JSON.stringify({ id, method, params }));
+  return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
+}
+
+function evaluate(socket, expression) {
+  return command(socket, "Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+    userGesture: true
+  }).then((response) => {
+    if (response.exceptionDetails) {
+      throw new Error(response.exceptionDetails.text || "Runtime evaluation failed");
+    }
+    return response.result?.value;
+  });
+}
+
+async function setViewport(socket, width, height) {
+  await command(socket, "Emulation.setDeviceMetricsOverride", {
+    width,
+    height,
+    deviceScaleFactor: 1,
+    mobile: width < 600
+  });
+  await wait(120);
+}
+
+async function captureScreenshot(socket, filename) {
+  const directory = process.env.SCREENSHOT_DIR;
+  if (!directory) return;
+  fs.mkdirSync(directory, { recursive: true });
+  const response = await command(socket, "Page.captureScreenshot", {
+    format: "png",
+    captureBeyondViewport: false,
+    fromSurface: true
+  });
+  fs.writeFileSync(path.join(directory, filename), Buffer.from(response.data, "base64"));
+}
+
+async function run() {
+  const target = await createTarget();
+  const socket = await connect(target.webSocketDebuggerUrl);
+
+  socket.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+    if (message.id && pending.has(message.id)) {
+      const operation = pending.get(message.id);
+      pending.delete(message.id);
+      if (message.error) operation.reject(new Error(message.error.message));
+      else operation.resolve(message.result);
+      return;
+    }
+    if (message.method === "Runtime.exceptionThrown") {
+      runtimeErrors.push(message.params.exceptionDetails?.text ?? "Unknown runtime exception");
+    }
+    if (message.method === "Runtime.consoleAPICalled" && message.params.type === "error") {
+      consoleErrors.push(message.params.args?.map((item) => item.value ?? item.description).join(" ") ?? "console.error");
+    }
+    if (message.method === "Log.entryAdded" && message.params.entry.level === "error") {
+      consoleErrors.push(message.params.entry.text);
+    }
+  });
+
+  await Promise.all([
+    command(socket, "Page.enable"),
+    command(socket, "Runtime.enable"),
+    command(socket, "Log.enable"),
+    command(socket, "Network.enable")
+  ]);
+  await command(socket, "Network.setCacheDisabled", { cacheDisabled: true });
+
+  const loaded = new Promise((resolve) => {
+    const listener = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.method === "Page.loadEventFired") {
+        socket.removeEventListener("message", listener);
+        resolve();
+      }
+    };
+    socket.addEventListener("message", listener);
+  });
+  await command(socket, "Page.navigate", { url: targetUrl });
+  await Promise.race([loaded, wait(8000)]);
+  await wait(500);
+  await setViewport(socket, 1440, 1000);
+  await evaluate(socket, "window.scrollTo(0, 0)");
+  await wait(100);
+  await captureScreenshot(socket, "bfm-desktop-cdp.png");
+
+  const basics = await evaluate(socket, `(() => ({
+    title: document.title,
+    lang: document.documentElement.lang,
+    h1: document.querySelectorAll("h1").length,
+    modules: document.querySelectorAll(".module").length,
+    quiz: document.querySelectorAll(".quiz-card").length,
+    glossary: document.querySelectorAll(".glossary-card").length,
+    js: document.documentElement.classList.contains("js-enabled"),
+    heroPurpose: (() => {
+      const heading = document.querySelector("#hero-title")?.textContent.trim() || "";
+      const copy = document.querySelector(".hero-copy")?.innerText.trim() || "";
+      const copyBox = document.querySelector(".hero-copy")?.getBoundingClientRect();
+      const designBox = document.querySelector(".hero-briefing")?.getBoundingClientRect();
+      const headingRange = document.createRange();
+      const headingElement = document.querySelector("#hero-title");
+      if (headingElement) headingRange.selectNodeContents(headingElement);
+      const headingBox = headingElement ? headingRange.getBoundingClientRect() : null;
+      const combined = heading + " " + copy;
+      return {
+        heading,
+        aboutSitePurpose: combined.includes("このサイト") && combined.includes("目的"),
+        definitionLikeHeading: /BFM\\s*とは|何のために存在する/.test(heading),
+        verticallyStacked: Boolean(copyBox && designBox && designBox.top >= copyBox.bottom - 1),
+        headingUsesWidth: Boolean(headingBox && headingBox.right >= window.innerWidth * 0.7),
+        headingOneLine: Boolean(headingElement && getComputedStyle(headingElement).whiteSpace === "nowrap")
+      };
+    })(),
+    welcomeSequence: (() => {
+      const section = document.querySelector("#welcome");
+      const sticky = section?.querySelector(".welcome-sticky");
+      const messages = [...(section?.querySelectorAll(".welcome-message") || [])];
+      return {
+        beforePart1: Boolean(section && section.nextElementSibling?.classList.contains("hero")),
+        messages: messages.map((message) => message.textContent.trim()),
+        sticky: sticky ? getComputedStyle(sticky).position === "sticky" : false,
+        heightRatio: section ? section.getBoundingClientRect().height / innerHeight : 0,
+        initialOpacities: messages.map((message) => parseFloat(getComputedStyle(message).opacity))
+      };
+    })(),
+    heroPartLabel: (() => {
+      const part = document.querySelector(".hero-part-label");
+      const title = document.querySelector("#hero-title");
+      if (!part || !title) return null;
+      const partBox = part.getBoundingClientRect();
+      const titleBox = title.getBoundingClientRect();
+      const partSize = parseFloat(getComputedStyle(part).fontSize) || 0;
+      const titleSize = parseFloat(getComputedStyle(title).fontSize) || 0;
+      return {
+        text: part.textContent.trim(),
+        partSize,
+        titleSize,
+        ratio: titleSize ? partSize / titleSize : 0,
+        aboveTitle: partBox.bottom <= titleBox.top + 1,
+        plainLabel: part.children.length === 0
+      };
+    })(),
+    creatorNote: (() => {
+      const note = document.querySelector(".creator-note");
+      const purpose = document.querySelector(".hero-purpose");
+      const request = document.querySelector(".creator-request");
+      const noteStyle = note ? getComputedStyle(note) : null;
+      const purposeStyle = purpose ? getComputedStyle(purpose) : null;
+      const requestStyle = request ? getComputedStyle(request) : null;
+      const boxes = [note, purpose, request].map((element) => element?.getBoundingClientRect());
+      return {
+        text: note?.textContent.trim() || "",
+        immediatelyBeforePurpose: Boolean(note && purpose && note.nextElementSibling === purpose),
+        visuallyBeforePurpose: Boolean(note && purpose && note.getBoundingClientRect().bottom <= purpose.getBoundingClientRect().top + 1),
+        matchingFormat: Boolean(noteStyle && purposeStyle &&
+          noteStyle.fontSize === purposeStyle.fontSize && noteStyle.color === purposeStyle.color &&
+          noteStyle.lineHeight === purposeStyle.lineHeight && noteStyle.borderInlineStartWidth === purposeStyle.borderInlineStartWidth),
+        labels: [note?.querySelector("span")?.textContent.trim() || "", purpose?.querySelector("span")?.textContent.trim() || ""],
+        requestText: request?.textContent.trim() || "",
+        requestAfterPurpose: Boolean(request && purpose && purpose.nextElementSibling === request &&
+          purpose.getBoundingClientRect().bottom <= request.getBoundingClientRect().top + 1),
+        requestMatchingFormat: Boolean(purposeStyle && requestStyle &&
+          purposeStyle.fontSize === requestStyle.fontSize && purposeStyle.color === requestStyle.color &&
+          purposeStyle.lineHeight === requestStyle.lineHeight),
+        equalWidths: boxes.every(Boolean) && Math.max(...boxes.map((box) => box.width)) - Math.min(...boxes.map((box) => box.width)) <= 1,
+        equalSpacing: boxes.every(Boolean) && Math.abs((boxes[1].top - boxes[0].bottom) - (boxes[2].top - boxes[1].bottom)) <= 1
+      };
+    })(),
+    decisionCycle: (() => {
+      const items = [...document.querySelectorAll(".triangle-flow .flow-node")];
+      const returnPath = document.querySelector(".triangle-flow > svg > path:last-of-type");
+      const observe = document.querySelector(".flow-observe");
+      const flowHeading = document.querySelector(".flow-heading");
+      let returnArrowClearance = 0;
+      if (returnPath && observe) {
+        const end = returnPath.getPointAtLength(returnPath.getTotalLength());
+        const screenEnd = new DOMPoint(end.x, end.y).matrixTransform(returnPath.getScreenCTM());
+        const rect = observe.getBoundingClientRect();
+        returnArrowClearance = Math.hypot(
+          Math.max(rect.left - screenEnd.x, 0, screenEnd.x - rect.right),
+          Math.max(rect.top - screenEnd.y, 0, screenEnd.y - rect.bottom)
+        );
+      }
+      return {
+        labels: items.map((item) => item.textContent.trim().replace(/\\s+/g, " ")),
+        returnText: document.querySelector(".triangle-flow > p")?.textContent.trim().replace(/\\s+/g, " ") || "",
+        paths: document.querySelectorAll(".triangle-flow > svg > path").length,
+        heading: flowHeading?.textContent.trim() || "",
+        observeTop: parseFloat(getComputedStyle(observe).top),
+        returnArrowClearance,
+        headingClearance: observe && flowHeading ? observe.getBoundingClientRect().top - flowHeading.getBoundingClientRect().bottom : 0
+      };
+    })(),
+    learningDesignParity: [...document.querySelectorAll(".hero-briefing dt")].every((item) => {
+      const number = item.querySelector("span");
+      return number && Math.abs(parseFloat(getComputedStyle(number).fontSize) - parseFloat(getComputedStyle(item).fontSize)) < 0.5;
+    }),
+    heroStatsRemoved: !document.querySelector(".hero-stats"),
+    punctuationPolicy: {
+      titlesWithFullStop: [...document.querySelectorAll(".hero-part-label, h1, h2, h3, h4")]
+        .map((title) => title.textContent.trim())
+        .filter((title) => title.includes(String.fromCharCode(0x3002))),
+      bodyFullStopCount: [...document.querySelectorAll("main p, main dd, .quiz-feedback, .glossary-desc")]
+        .reduce((count, element) => count + element.textContent.split(String.fromCharCode(0x3002)).length - 1, 0)
+    },
+    recapLayout: (() => {
+      const section = document.querySelector("#recap");
+      const header = section?.querySelector(":scope > .module-header");
+      const panel = section?.querySelector(":scope > .recap-panel");
+      const firstItem = panel?.querySelector(".recap-list li");
+      const quiz = document.querySelector("#quiz");
+      return {
+        headerOutsidePanel: Boolean(header && panel && !panel.contains(header)),
+        panelStartsAtFirstItem: Boolean(panel && firstItem && Math.abs(panel.getBoundingClientRect().top - firstItem.getBoundingClientRect().top) <= 2),
+        dividerBeforeQuiz: Boolean(quiz && parseFloat(getComputedStyle(quiz).borderTopWidth) >= 1)
+      };
+    })(),
+    nextPart: {
+      indexLabel: document.querySelector('.section-index a[href="#next"]')?.textContent.trim().replace(/\s+/g, " ") || "",
+      title: document.querySelector("#next .module-title-text")?.textContent.trim() || "",
+      changelogRemoved: !document.querySelector("#changelog") && !document.querySelector(".timeline"),
+      titleOutsidePanel: (() => {
+        const title = document.querySelector("#next-title");
+        const panel = document.querySelector("#next > .next-panel");
+        return Boolean(title && panel && !panel.contains(title) && title.getBoundingClientRect().bottom < panel.getBoundingClientRect().top);
+      })(),
+      titleAligned: (() => {
+        const title = document.querySelector("#next-title");
+        const previousTitle = document.querySelector("#references-title");
+        return Boolean(title && previousTitle && Math.abs(title.getBoundingClientRect().left - previousTitle.getBoundingClientRect().left) <= 2);
+      })()
+    },
+    turnCircleTopics: [...document.querySelectorAll("#turn-circle .topic-heading h3")].map((heading) => heading.textContent.trim()),
+    inlineNumberParity: [
+      [".fundamentals-path > li", "span", "h3"],
+      [".zones-copy > article", ":scope > span", ":scope > h3"],
+      [".zone-reading-order li", ":scope > span", "b"],
+      [".recap-list li", ":scope > span", null]
+    ].flatMap(([container, numberSelector, titleSelector]) => [...document.querySelectorAll(container)].map((item) => {
+      const number = item.querySelector(numberSelector);
+      const title = titleSelector ? item.querySelector(titleSelector) : item;
+      return {
+        numberSize: number ? parseFloat(getComputedStyle(number).fontSize) || 0 : 0,
+        titleSize: title ? parseFloat(getComputedStyle(title).fontSize) || 0 : 0
+      };
+    })),
+    numberedModuleHeadings: [...document.querySelectorAll(".module-header .numbered-module-title")].map((heading) => ({
+      number: heading.querySelector(".module-title-number")?.textContent.trim() || "",
+      text: heading.textContent.trim().replace(/\\s+/g, " "),
+      hasStandaloneCode: Boolean(heading.parentElement?.querySelector(":scope > .section-code")),
+      numberSize: parseFloat(getComputedStyle(heading.querySelector(".module-title-number")).fontSize) || 0,
+      titleSize: parseFloat(getComputedStyle(heading.querySelector(".module-title-text")).fontSize) || 0,
+      numberAboveTitle: heading.querySelector(".module-title-number").getBoundingClientRect().bottom <=
+        heading.querySelector(".module-title-text").getBoundingClientRect().top + 1,
+      titleOneLine: heading.querySelector(".module-title-text").getClientRects().length === 1
+    })),
+    indexResizer: (() => {
+      const separator = document.querySelector("#index-resizer");
+      return separator ? {
+        role: separator.getAttribute("role"),
+        orientation: separator.getAttribute("aria-orientation"),
+        value: Number(separator.getAttribute("aria-valuenow")),
+        visible: getComputedStyle(separator).display !== "none"
+      } : null;
+    })(),
+    globalNav: (() => {
+      const links = [...document.querySelectorAll("#global-nav a")];
+      return {
+        labels: links.map((link) => link.textContent.trim().replace(/\\s+/g, " ")),
+        targets: links.map((link) => link.getAttribute("href") || ""),
+        validTargets: links.every((link) => {
+          const href = link.getAttribute("href") || "";
+          return href.startsWith("#") && href.length > 1 && Boolean(document.getElementById(href.slice(1)));
+        })
+      };
+    })(),
+    missionIndexTypography: [...document.querySelectorAll(".section-index a")].map((link) => {
+      const number = link.querySelector("span");
+      const titleSize = parseFloat(getComputedStyle(link).fontSize) || 0;
+      const numberSize = number ? parseFloat(getComputedStyle(number).fontSize) || 0 : 0;
+      return {
+        label: link.textContent.trim().replace(/\\s+/g, " "),
+        numberSize,
+        titleSize,
+        ratio: titleSize ? numberSize / titleSize : 0
+      };
+    }),
+    missionIndexMatches: [...document.querySelectorAll(".section-index a")].every((link, index) => {
+      const target = document.querySelector(link.getAttribute("href"));
+      const title = target?.querySelector(".module-title-text")?.textContent.trim() || "";
+      const clone = link.cloneNode(true);
+      clone.querySelector("span")?.remove();
+      return link.querySelector("span")?.textContent.trim() === String(index + 1).padStart(2, "0") &&
+        clone.textContent.trim() === title;
+    }),
+    wordBreakStyles: ["#hero-title", "#turn-title", ".term-en", ".course-choice h3", ".glossary-card h3"]
+      .map((selector) => ({ selector, element: document.querySelector(selector) }))
+      .filter(({ element }) => Boolean(element))
+      .map(({ selector, element }) => {
+        const style = getComputedStyle(element);
+        return {
+          selector,
+          wordBreak: style.wordBreak,
+          overflowWrap: style.overflowWrap,
+          hyphens: style.hyphens
+        };
+      }),
+    japaneseTypography: [".lead-copy", ".learning-goal", ".checkpoint p"]
+      .map((selector) => document.querySelector(selector))
+      .filter(Boolean)
+      .map((element) => {
+        const style = getComputedStyle(element);
+        return { wordBreak: style.wordBreak, lineBreak: style.lineBreak, textWrap: style.textWrap };
+      }),
+    excludedTerms: (() => {
+      const pageText = document.body.innerText.toLowerCase();
+      const terms = ["3" + "/9", ["Fog", "of", "War"].join(" "), "W" + "VR"];
+      return terms.filter((term) => pageText.includes(term.toLowerCase()));
+    })(),
+    internalLinksValid: [...document.querySelectorAll('a[href^="#"]')].every((link) => {
+      const href = link.getAttribute("href");
+      return href === "#" || Boolean(document.querySelector(href));
+    }),
+    unlabeledButtons: [...document.querySelectorAll("button")].filter((button) =>
+      !((button.getAttribute("aria-label") || button.textContent).trim())
+    ).length,
+    imagesMissingAlt: [...document.images].filter((image) => !image.alt.trim()).length,
+    duplicateIds: [...document.querySelectorAll("[id]")]
+      .map((element) => element.id)
+      .filter((id, index, ids) => ids.indexOf(id) !== index),
+    brokenAriaRefs: [...document.querySelectorAll("[aria-controls], [aria-labelledby], [aria-describedby]")]
+      .flatMap((element) => ["aria-controls", "aria-labelledby", "aria-describedby"]
+        .flatMap((attribute) => (element.getAttribute(attribute) || "").split(/\\s+/).filter(Boolean)))
+      .filter((id) => !document.getElementById(id))
+  }))()`);
+  record("日本語タイトル", basics.title.includes("BFM STARTER"), basics.title);
+  record("lang=ja", basics.lang === "ja", basics.lang);
+  record("H1が1つ", basics.h1 === 1, basics.h1);
+  record("学習モジュールが揃う", basics.modules >= 15, basics.modules);
+  record("確認問題が12問", basics.quiz === 12, basics.quiz);
+  record("用語集が十分に展開される", basics.glossary >= 45, basics.glossary);
+  record(
+    "最上部はサイトを作った目的を示す",
+    basics.heroPurpose.aboutSitePurpose && !basics.heroPurpose.definitionLikeHeading &&
+      basics.heroPurpose.heading === "BFMの基礎を、迷わず" && basics.heroPurpose.verticallyStacked &&
+      basics.heroPurpose.headingUsesWidth && basics.heroPurpose.headingOneLine,
+    JSON.stringify(basics.heroPurpose)
+  );
+  record(
+    "PART 1の前にスクロール連動ウェルカムを表示",
+    basics.welcomeSequence.beforePart1 && basics.welcomeSequence.sticky && basics.welcomeSequence.heightRatio >= 1.9 &&
+      basics.welcomeSequence.messages.join("|") ===
+        "ようこそBFM Starterへ|ここではドックファイトにおいて必要なBFMを学ぶことができます" &&
+      basics.welcomeSequence.initialOpacities[0] >= 0.99 && basics.welcomeSequence.initialOpacities[1] <= 0.01,
+    JSON.stringify(basics.welcomeSequence)
+  );
+  const welcomeSamples = [];
+  await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
+  for (const ratio of [0.6, 0.75, 0.9, 1]) {
+    await evaluate(socket, `(() => {
+      const section = document.querySelector("#welcome");
+      const distance = Math.max(1, section.offsetHeight - innerHeight);
+      window.scrollTo(0, section.offsetTop + distance * ${ratio});
+    })()`);
+    await wait(100);
+    welcomeSamples.push(await evaluate(socket, `(() => ({
+      ratio: ${ratio},
+      first: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="1"]')).opacity),
+      second: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="2"]')).opacity)
+    }))()`));
+  }
+  const welcomeTransition = welcomeSamples.reduce((best, sample) => sample.second > best.second ? sample : best);
+  record(
+    "スクロールに応じて2つ目の案内へ切り替わる",
+    welcomeTransition.first <= 0.05 && welcomeTransition.second >= 0.75,
+    JSON.stringify(welcomeSamples)
+  );
+  await evaluate(socket, "window.scrollTo(0, 0)");
+  await evaluate(socket, 'document.documentElement.style.removeProperty("scroll-behavior")');
+  await wait(120);
+  record(
+    "PART 1を主タイトルと同程度の大きさで上段に配置",
+    basics.heroPartLabel?.text === "PART 1:" && basics.heroPartLabel.ratio >= 0.95 &&
+      basics.heroPartLabel.ratio <= 1.05 && basics.heroPartLabel.aboveTitle && basics.heroPartLabel.plainLabel,
+    JSON.stringify(basics.heroPartLabel)
+  );
+  record(
+    "このサイトの目的の直前に制作背景を表示",
+    basics.creatorNote.immediatelyBeforePurpose && basics.creatorNote.visuallyBeforePurpose && basics.creatorNote.matchingFormat &&
+      basics.creatorNote.text.includes("まとめノートとして制作しました") &&
+      basics.creatorNote.labels.join("|") === "制作背景|サイトの目的",
+    JSON.stringify(basics.creatorNote)
+  );
+  record(
+    "サイトの目的の下にお願いを表示",
+    basics.creatorNote.requestAfterPurpose && basics.creatorNote.requestMatchingFormat &&
+      basics.creatorNote.equalWidths && basics.creatorNote.equalSpacing &&
+      basics.creatorNote.requestText ===
+        "お願い本サイトは初心者が初心者のためにつくりました。間違っている箇所があるかもしれませんが、ご容赦ください。",
+    JSON.stringify(basics.creatorNote)
+  );
+  record(
+    "判断サイクルは01→02→03→01",
+    basics.decisionCycle.labels.join("|") === "01観察する|02変化を予測する|03機動を選ぶ" &&
+      basics.decisionCycle.returnText.includes("03から01へ戻る") && basics.decisionCycle.paths === 3 &&
+      basics.decisionCycle.heading === "判断軸をもとにした戦闘時の思考フロー" &&
+      basics.decisionCycle.observeTop < 0 && basics.decisionCycle.returnArrowClearance >= 8 &&
+      basics.decisionCycle.headingClearance >= 56,
+    JSON.stringify(basics.decisionCycle)
+  );
+  record(
+    "教材統計を撤去しLearning Designの番号サイズを統一",
+    basics.heroStatsRemoved && basics.learningDesignParity,
+    JSON.stringify({ heroStatsRemoved: basics.heroStatsRemoved, learningDesignParity: basics.learningDesignParity })
+  );
+  record(
+    "PARTとトピック見出しは句点なし、本文は句点あり",
+    basics.punctuationPolicy.titlesWithFullStop.length === 0 && basics.punctuationPolicy.bodyFullStopCount > 100,
+    JSON.stringify(basics.punctuationPolicy)
+  );
+  record(
+    "Turning Roomの2組の連番に見出しがある",
+    basics.turnCircleTopics.join("|") ===
+      "Turning Roomを理解する3つの基本概念|Turning Roomを判断する3つの手順",
+    JSON.stringify(basics.turnCircleTopics)
+  );
+  record(
+    "初心者の要点は本文だけを囲み15章との区切り線を表示",
+    basics.recapLayout.headerOutsidePanel && basics.recapLayout.panelStartsAtFirstItem && basics.recapLayout.dividerBeforeQuiz,
+    JSON.stringify(basics.recapLayout)
+  );
+  record(
+    "更新履歴を撤去し18章をNext Partへ統合",
+    basics.nextPart.indexLabel === "18Next Part" && basics.nextPart.title === "Next Part" && basics.nextPart.changelogRemoved &&
+      basics.nextPart.titleOutsidePanel && basics.nextPart.titleAligned,
+    JSON.stringify(basics.nextPart)
+  );
+  record(
+    "本文内の連番と見出しは同じ文字サイズ",
+    basics.inlineNumberParity.length >= 20 && basics.inlineNumberParity.every((item) =>
+      item.numberSize > 0 && Math.abs(item.numberSize - item.titleSize) < 0.5
+    ),
+    JSON.stringify(basics.inlineNumberParity)
+  );
+  record(
+    "全章を番号と題名の統合見出しに統一",
+    basics.numberedModuleHeadings.length === 18 &&
+      basics.numberedModuleHeadings.every((item, index) =>
+        item.number === `${String(index + 1).padStart(2, "0")}:` && !item.hasStandaloneCode
+      ) &&
+      basics.numberedModuleHeadings[0]?.text === "01:BFMとは何か" &&
+      basics.numberedModuleHeadings.every((item) =>
+        item.numberSize > item.titleSize && item.numberAboveTitle && item.titleOneLine
+      ),
+    JSON.stringify(basics.numberedModuleHeadings)
+  );
+  record(
+    "MISSION INDEXは縦スプリッターで幅を調節できる",
+    basics.indexResizer?.role === "separator" && basics.indexResizer.orientation === "vertical" &&
+      basics.indexResizer.value >= 140 && basics.indexResizer.value <= 320 && basics.indexResizer.visible,
+    JSON.stringify(basics.indexResizer)
+  );
+  record(
+    "グローバルナビは3つの学習区分と有効なリンク",
+    basics.globalNav.labels.join("|") === "BFMの基本|Offensive BFM|Defensive BFM" &&
+      basics.globalNav.targets.length === 3 && basics.globalNav.validTargets,
+    JSON.stringify(basics.globalNav)
+  );
+  record(
+    "MISSION INDEXの番号はタイトルより少し大きい",
+    basics.missionIndexTypography.length === 18 && basics.missionIndexMatches && basics.missionIndexTypography.every((item) =>
+      item.numberSize > item.titleSize && item.ratio <= 1.35
+    ),
+    JSON.stringify(basics.missionIndexTypography)
+  );
+  const resizedIndex = await evaluate(socket, `(() => {
+    const separator = document.querySelector("#index-resizer");
+    const shell = document.querySelector("#page-shell");
+    const before = Number(separator.getAttribute("aria-valuenow"));
+    separator.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    const after = Number(separator.getAttribute("aria-valuenow"));
+    const width = getComputedStyle(shell).getPropertyValue("--index-width").trim();
+    separator.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    return { before, after, width };
+  })()`);
+  record(
+    "MISSION INDEXの幅をキーボードで変更できる",
+    resizedIndex.after === resizedIndex.before + 10 && resizedIndex.width === `${resizedIndex.after}px`,
+    JSON.stringify(resizedIndex)
+  );
+  await evaluate(socket, `document.querySelector("#index-resizer").scrollIntoView({ block: "center", behavior: "instant" })`);
+  await wait(100);
+  const dragStart = await evaluate(socket, `(() => {
+    const separator = document.querySelector("#index-resizer");
+    const box = separator.getBoundingClientRect();
+    return {
+      before: Number(separator.getAttribute("aria-valuenow")),
+      x: box.left + box.width / 2,
+      y: box.top + box.height / 2
+    };
+  })()`);
+  await command(socket, "Input.dispatchMouseEvent", { type: "mousePressed", x: dragStart.x, y: dragStart.y, button: "left", buttons: 1, clickCount: 1 });
+  await command(socket, "Input.dispatchMouseEvent", { type: "mouseMoved", x: dragStart.x + 30, y: dragStart.y, button: "left", buttons: 1 });
+  await command(socket, "Input.dispatchMouseEvent", { type: "mouseReleased", x: dragStart.x + 30, y: dragStart.y, button: "left", clickCount: 1 });
+  const draggedIndex = await evaluate(socket, `(() => {
+    const separator = document.querySelector("#index-resizer");
+    const after = Number(separator.getAttribute("aria-valuenow"));
+    separator.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    return { after };
+  })()`);
+  record(
+    "MISSION INDEXの幅をドラッグで変更できる",
+    draggedIndex.after === dragStart.before + 30,
+    JSON.stringify({ before: dragStart.before, after: draggedIndex.after })
+  );
+  record(
+    "見出しと英単語を単語途中で改行しない",
+    basics.wordBreakStyles.length >= 4 && basics.wordBreakStyles.every((item) =>
+      item.wordBreak !== "break-all" &&
+      item.overflowWrap !== "anywhere" &&
+      item.overflowWrap !== "break-word" &&
+      item.hyphens !== "auto"
+    ),
+    JSON.stringify(basics.wordBreakStyles)
+  );
+  record(
+    "日本語本文は文節と最終行を考慮して折り返す",
+    basics.japaneseTypography.length === 3 && basics.japaneseTypography.every((item) =>
+      item.lineBreak === "strict" && item.textWrap === "pretty" && item.wordBreak !== "break-all"
+    ),
+    JSON.stringify(basics.japaneseTypography)
+  );
+  record("対象外の3項目が本文・問題・用語集にない", basics.excludedTerms.length === 0, basics.excludedTerms.join(", "));
+  record("JavaScript初期化", basics.js, basics.js);
+  record("ページ内リンク参照先が存在", basics.internalLinksValid, basics.internalLinksValid);
+  record("ラベルなしボタンがない", basics.unlabeledButtons === 0, basics.unlabeledButtons);
+  record("掲載画像に代替テキストがある", basics.imagesMissingAlt === 0, basics.imagesMissingAlt);
+  record("重複IDがない", basics.duplicateIds.length === 0, basics.duplicateIds.join(", "));
+  record("ARIA参照先が存在", basics.brokenAriaRefs.length === 0, basics.brokenAriaRefs.join(", "));
+
+  const speedStates = await evaluate(socket, `(() => {
+    const buttons = [...document.querySelectorAll("[data-speed-region]")];
+    const states = buttons.map((button) => {
+      button.click();
+      return {
+        value: button.dataset.speedRegion,
+        name: document.querySelector("#speed-region-name").textContent.trim(),
+        pressed: buttons.filter((item) => item.getAttribute("aria-pressed") === "true").length,
+        active: buttons.filter((item) => item.classList.contains("is-active")).length
+      };
+    });
+    return { count: buttons.length, states };
+  })()`);
+  record("速度域は3つの選択ボタン", speedStates.count === 3, speedStates.count);
+  record(
+    "Low／Rate／Highを切り替えられる",
+    speedStates.states.map((state) => state.value).join("|") === "low|rate|high" &&
+      speedStates.states.every((state) => state.pressed === 1 && state.active === 1) &&
+      new Set(speedStates.states.map((state) => state.name)).size === 3,
+    JSON.stringify(speedStates.states)
+  );
+
+  const geometry = await evaluate(socket, `(() => ({
+    sliders: document.querySelectorAll("#aot-slider, #closure-slider, .geometry-lab").length,
+    tables: document.querySelectorAll(".geometry-reference-table").length,
+    text: document.querySelector(".geometry-table-grid")?.textContent.replace(/\\s+/g, " ").trim() || ""
+  }))()`);
+  record(
+    "Geometry操作UIを比較表へ置換",
+    geometry.sliders === 0 && geometry.tables === 2 &&
+      ["0°", "90°", "180°", "接近", "一定", "離隔"].every((term) => geometry.text.includes(term)),
+    JSON.stringify(geometry)
+  );
+
+  const references = await evaluate(socket, `(async () => {
+    const figures = [...document.querySelectorAll(".reference-figure")];
+    for (const figure of figures) {
+      const image = figure.querySelector("img");
+      image.loading = "eager";
+      image.scrollIntoView({ block: "center" });
+      if (!image.complete) {
+        await Promise.race([
+          new Promise((resolve) => image.addEventListener("load", resolve, { once: true })),
+          new Promise((resolve) => setTimeout(resolve, 2500))
+        ]);
+      }
+    }
+    const referenceLinks = [...document.querySelectorAll('#references a[href^="https://"]')];
+    const lessonMarkers = [...document.querySelectorAll('.learning-content > .module:not(#references) .source-marker')];
+    return {
+      figureCount: figures.length,
+      figures: figures.map((figure) => {
+        const image = figure.querySelector("img");
+        const caption = figure.querySelector("figcaption");
+        const marker = caption?.querySelector('a[href^="#ref-"]');
+        return {
+          loaded: Boolean(image?.complete && image.naturalWidth > 0),
+          alt: image?.alt.trim() || "",
+          caption: caption?.textContent.trim() || "",
+          marker: marker?.getAttribute("href") || ""
+        };
+      }),
+      referenceItems: document.querySelectorAll("#references .references-list > li").length,
+      referenceIds: [...document.querySelectorAll("#references .references-list > li")].map((item) => item.id),
+      firstMarkerOrder: lessonMarkers.reduce((order, marker) => {
+        const value = Number(marker.textContent.trim().slice(1, -1));
+        if (!order.includes(value)) order.push(value);
+        return order;
+      }, []),
+      referenceLinkCount: referenceLinks.length,
+      externalLinksValid: referenceLinks.every((link) =>
+        link.href.startsWith("https://") &&
+        link.target === "_blank" &&
+        link.relList.contains("noopener") &&
+        link.relList.contains("noreferrer")
+      ),
+      lessonReferencePanels: document.querySelectorAll(
+        ".learning-content > .module:not(#references) .source-note-card, " +
+        ".learning-content > .module:not(#references) .source-link-card, " +
+        ".learning-content > .module:not(#references) .source-media, " +
+        ".learning-content > .module:not(#references) .source-video"
+      ).length,
+      embeddedVideos: document.querySelectorAll(".learning-content iframe").length,
+      markerDetails: lessonMarkers.map((marker) => ({
+        label: marker.textContent.trim(),
+        href: marker.getAttribute("href") || "",
+        size: parseFloat(getComputedStyle(marker).fontSize) || 0
+      })),
+      markersValid: lessonMarkers.length >= 8 && lessonMarkers.every((marker) => {
+        const href = marker.getAttribute("href") || "";
+        const target = href.startsWith("#") ? document.querySelector(href) : null;
+        const label = marker.textContent.trim();
+        const referenceNumber = Number(label.slice(1, -1));
+        return label.startsWith("[") && label.endsWith("]") && Number.isInteger(referenceNumber) &&
+          Boolean(target) &&
+          parseFloat(getComputedStyle(marker).fontSize) < parseFloat(getComputedStyle(marker.parentElement).fontSize);
+      })
+    };
+  })()`);
+  record("出典付き公開画像が3点", references.figureCount === 3, references.figureCount);
+  record(
+    "3画像は小さな参照番号で第17章へリンク",
+    references.figures.every((figure) =>
+      figure.loaded && figure.alt.length >= 12 && /^#ref-\d+$/.test(figure.marker)
+    ),
+    JSON.stringify(references.figures)
+  );
+  record(
+    "参考情報と外部リンクは第17章へ集約",
+    references.referenceItems === 9 && references.referenceLinkCount >= 10 &&
+      references.externalLinksValid && references.lessonReferencePanels === 0 &&
+      references.embeddedVideos === 0 && references.markersValid &&
+      references.firstMarkerOrder.join("|") === "1|2|3|4|5" &&
+      references.referenceIds.join("|") === "ref-1|ref-2|ref-3|ref-4|ref-5|ref-6|ref-7|ref-8|ref-9",
+    JSON.stringify(references)
+  );
+
+  const comparisons = await evaluate(socket, `(() => ({
+    pursuit: document.querySelectorAll(".pursuit-comparison article").length,
+    overshoot: document.querySelectorAll(".overshoot-comparison article").length,
+    alignment: document.querySelectorAll(".alignment-comparison article").length,
+    plane: document.querySelectorAll(".plane-comparison article").length,
+    tables: document.querySelectorAll(".table-wrap table").length
+  }))()`);
+  record(
+    "図の代替となる比較カードが揃う",
+    comparisons.pursuit === 3 && comparisons.overshoot === 2 &&
+      comparisons.alignment === 2 && comparisons.plane === 2 && comparisons.tables >= 1,
+    JSON.stringify(comparisons)
+  );
+
+  await command(socket, "Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }]
+  });
+  const reducedMotion = await evaluate(socket, `(() => ({
+    scroll: getComputedStyle(document.documentElement).scrollBehavior,
+    transitionSeconds: parseFloat(getComputedStyle(document.querySelector(".button")).transitionDuration) || 0,
+    welcomePosition: getComputedStyle(document.querySelector(".welcome-sticky")).position,
+    welcomeOpacities: [...document.querySelectorAll(".welcome-message")].map((message) => parseFloat(getComputedStyle(message).opacity))
+  }))()`);
+  record(
+    "動きを減らす設定に対応",
+    reducedMotion.scroll === "auto" && reducedMotion.transitionSeconds <= 0.000001 &&
+      reducedMotion.welcomePosition === "relative" && reducedMotion.welcomeOpacities.every((opacity) => opacity === 1),
+    JSON.stringify(reducedMotion)
+  );
+  await command(socket, "Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "no-preference" }]
+  });
+
+  const glossary = await evaluate(socket, `(() => {
+    const input = document.querySelector("#glossary-input");
+    input.value = "接近率";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    const count = Number(document.querySelector("#glossary-count").textContent);
+    const terms = [...document.querySelectorAll(".glossary-card h3")].map((element) => element.textContent.toLowerCase());
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    return { count, terms };
+  })()`);
+  record("用語集の日本語検索", glossary.count >= 1 && glossary.terms.includes("closure"), JSON.stringify(glossary));
+
+  const correctAnswers = [1, 1, 2, 0, 0, 1, 1, 0, 1, 1, 1, 2];
+  let quizFocusRetained = false;
+  for (let index = 0; index < correctAnswers.length; index += 1) {
+    const focusState = await evaluate(socket, `(() => {
+      const card = document.querySelector('[data-quiz-index="${index}"]');
+      card.querySelectorAll('input[type="radio"]')[${correctAnswers[index]}].click();
+      card.querySelector(".quiz-submit").click();
+      return document.activeElement?.classList.contains("quiz-feedback") || document.activeElement?.id === "quiz-result";
+    })()`);
+    if (index === 0) quizFocusRetained = focusState;
+  }
+  record("クイズ回答後のフォーカス保持", quizFocusRetained, quizFocusRetained);
+  const quizResult = await evaluate(socket, `(() => ({
+    score: document.querySelector("#quiz-score").textContent,
+    hidden: document.querySelector("#quiz-result").hidden,
+    answered: document.querySelector("#quiz-answered").textContent
+  }))()`);
+  record(
+    "クイズ全問正解を採点",
+    quizResult.score === "12" && !quizResult.hidden && quizResult.answered.startsWith("12"),
+    JSON.stringify(quizResult)
+  );
+
+  const courseFlow = await evaluate(socket, `(() => {
+    const quiz = document.querySelector("#quiz");
+    const next = document.querySelector("#next");
+    const nextText = next?.textContent || "";
+    const resultLink = document.querySelector('#quiz-message a[href="#next"]');
+    return {
+      afterQuiz: Boolean(quiz && next && (quiz.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      hasOffensive: /Offensive BFM/i.test(nextText),
+      hasDefensive: /Defensive BFM/i.test(nextText),
+      resultLinkText: resultLink?.textContent.trim() || ""
+    };
+  })()`);
+  record(
+    "基礎修了後に2コースを選択できる",
+    courseFlow.afterQuiz && courseFlow.hasOffensive && courseFlow.hasDefensive && courseFlow.resultLinkText.length > 0,
+    JSON.stringify(courseFlow)
+  );
+
+  await evaluate(socket, `document.querySelector("#quiz-reset").click()`);
+  const resetState = await evaluate(socket, `(() => ({
+    hidden: document.querySelector("#quiz-result").hidden,
+    answered: document.querySelector("#quiz-answered").textContent,
+    checked: document.querySelectorAll('#quiz-list input:checked').length,
+    focus: document.activeElement?.matches('#quiz-list input') || false
+  }))()`);
+  record(
+    "クイズ再挑戦リセット",
+    resetState.hidden && resetState.answered.startsWith("0") && resetState.checked === 0 && resetState.focus,
+    JSON.stringify(resetState)
+  );
+
+  await setViewport(socket, 375, 812);
+  await evaluate(socket, "window.scrollTo(0, 0)");
+  await wait(100);
+  await captureScreenshot(socket, "bfm-mobile-cdp.png");
+  const mobile = await evaluate(socket, `(() => {
+    const button = document.querySelector("#menu-toggle");
+    button.click();
+    const open = button.getAttribute("aria-expanded") === "true" && document.querySelector("#global-nav").classList.contains("is-open");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    const closed = button.getAttribute("aria-expanded") === "false";
+    return {
+      open,
+      closed,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      heroStatsRemoved: !document.querySelector(".hero-stats"),
+      flowClearance: (() => {
+        const path = document.querySelector(".triangle-flow > svg > path:last-of-type");
+        const observe = document.querySelector(".flow-observe");
+        const heading = document.querySelector(".flow-heading");
+        const end = path.getPointAtLength(path.getTotalLength());
+        const screenEnd = new DOMPoint(end.x, end.y).matrixTransform(path.getScreenCTM());
+        const rect = observe.getBoundingClientRect();
+        return {
+          arrow: Math.hypot(
+            Math.max(rect.left - screenEnd.x, 0, screenEnd.x - rect.right),
+            Math.max(rect.top - screenEnd.y, 0, screenEnd.y - rect.bottom)
+          ),
+          heading: rect.top - heading.getBoundingClientRect().bottom
+        };
+      })(),
+      speedButtonsWithinViewport: [...document.querySelectorAll("[data-speed-region]")].every((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.left >= -1 && rect.right <= innerWidth + 1;
+      })
+    };
+  })()`);
+  record("モバイルメニュー開閉", mobile.open && mobile.closed, JSON.stringify(mobile));
+  record("375pxで横オーバーフローなし", mobile.overflow <= 1, mobile.overflow);
+  record(
+    "375pxで主要UIが画面内",
+    mobile.heroStatsRemoved && mobile.speedButtonsWithinViewport &&
+      mobile.flowClearance.arrow >= 8 && mobile.flowClearance.heading >= 56,
+    JSON.stringify(mobile)
+  );
+
+  await setViewport(socket, 320, 568);
+  const narrow = await evaluate(socket, `(() => ({
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    titleVisible: document.querySelector("h1").getBoundingClientRect().width > 0
+  }))()`);
+  record("320pxで横オーバーフローなし", narrow.overflow <= 1, narrow.overflow);
+  record("320pxでH1表示", narrow.titleVisible, narrow.titleVisible);
+
+  await evaluate(socket, `window.scrollTo(0, document.documentElement.scrollHeight)`);
+  await wait(120);
+  const progress = await evaluate(socket, `(() => ({
+    value: Number(document.querySelector(".index-progress").getAttribute("aria-valuenow")),
+    visualValue: Number(document.querySelector(".reading-progress").getAttribute("aria-valuenow")),
+    text: document.querySelector("#progress-percent").textContent
+  }))()`);
+  record(
+    "ページ進捗が100%付近",
+    progress.value >= 99 && progress.visualValue >= 99 && progress.text.includes("100"),
+    JSON.stringify(progress)
+  );
+
+  record("Runtime例外なし", runtimeErrors.length === 0, runtimeErrors.join(" | "));
+  record("Console errorなし", consoleErrors.length === 0, consoleErrors.join(" | "));
+
+  await command(socket, "Emulation.setScriptExecutionDisabled", { value: true });
+  await command(socket, "Page.navigate", { url: targetUrl });
+  await wait(800);
+  await command(socket, "Emulation.setScriptExecutionDisabled", { value: false });
+  const noScript = await evaluate(socket, `(() => ({
+    initialized: document.documentElement.classList.contains("js-enabled"),
+    moduleCount: document.querySelectorAll(".module").length,
+    textLength: document.querySelector("main").innerText.length,
+    navDisplay: getComputedStyle(document.querySelector("#global-nav")).display,
+    menuDisplay: getComputedStyle(document.querySelector("#menu-toggle")).display,
+    noscriptVisible: [...document.querySelectorAll("noscript")].some((element) => getComputedStyle(element).display !== "none")
+  }))()`);
+  record(
+    "JavaScript無効時も基本教材を読める",
+    !noScript.initialized && noScript.moduleCount >= 15 && noScript.textLength > 10000 &&
+      noScript.navDisplay !== "none" && noScript.menuDisplay === "none" && noScript.noscriptVisible,
+    JSON.stringify(noScript)
+  );
+
+  socket.close();
+}
+
+try {
+  await run();
+} catch (error) {
+  record("テストランナー", false, error.stack || error.message);
+}
+
+for (const result of results) {
+  const marker = result.pass ? "PASS" : "FAIL";
+  process.stdout.write(`${marker.padEnd(5)} ${result.name}${result.detail ? ` — ${result.detail}` : ""}\n`);
+}
+
+const failures = results.filter((result) => !result.pass);
+process.stdout.write(`\n${results.length - failures.length}/${results.length} checks passed\n`);
+if (failures.length) process.exitCode = 1;

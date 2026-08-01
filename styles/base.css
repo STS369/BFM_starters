@@ -1,0 +1,158 @@
+/* =========================================================
+   BFM STARTER — document base
+   Reset, body typography, links, focus and reading progress
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 24px);
+  line-break: strict;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+  overflow-x: hidden;
+  color: var(--text-soft);
+  background:
+    radial-gradient(circle at 82% 2%, rgba(48, 104, 130, 0.12), transparent 23rem),
+    linear-gradient(180deg, var(--ink-900), var(--ink-950) 55%);
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  line-height: 1.82;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prefer Japanese phrase boundaries where the browser supports them.
+   The normal fallback still keeps Latin words intact. */
+@supports (word-break: auto-phrase) {
+  body {
+    word-break: auto-phrase;
+  }
+}
+
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(112, 159, 177, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(112, 159, 177, 0.018) 1px, transparent 1px);
+  background-size: 38px 38px;
+  content: "";
+  pointer-events: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: var(--cyan-bright);
+  text-underline-offset: 0.22em;
+}
+
+a:hover {
+  color: #fff;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+p:last-child,
+ul:last-child,
+ol:last-child {
+  margin-bottom: 0;
+}
+
+strong {
+  color: var(--text);
+}
+
+::selection {
+  color: var(--ink-950);
+  background: var(--cyan);
+}
+
+:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  z-index: 1000;
+  padding: 0.65rem 1rem;
+  color: var(--ink-950);
+  background: var(--cyan-bright);
+  font-weight: 800;
+  transform: translateY(-150%);
+  transition: transform 0.18s ease;
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1001;
+  height: 3px;
+  background: transparent;
+}
+
+.reading-progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--orange));
+  box-shadow: 0 0 12px rgba(89, 214, 232, 0.8);
+}

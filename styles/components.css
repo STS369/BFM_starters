@@ -1,0 +1,306 @@
+/* =========================================================
+   BFM STARTER — shared components
+   Lesson headings, buttons, cards, callouts and content primitives
+   ========================================================= */
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.7rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-primary {
+  border-color: var(--cyan);
+  color: var(--ink-950);
+  background: var(--cyan);
+}
+
+.button-primary:hover {
+  border-color: var(--text);
+  color: var(--ink-950);
+  background: var(--text);
+}
+
+.button-quiet {
+  color: var(--text);
+  background: rgba(12, 28, 40, 0.6);
+}
+
+.button.disabled {
+  color: var(--muted);
+  background: rgba(60, 75, 84, 0.18);
+  cursor: not-allowed;
+}
+
+
+/**
+ * BFM STARTER component layer
+ *
+ * Semantic component classes are the canonical CSS API. Existing feature
+ * classes remain in the markup as compatibility and JavaScript hooks.
+ */
+
+/* LessonHeader: number, title and learning goal */
+.lesson-header,
+.lesson-title,
+.lesson-goal,
+.lesson-number,
+.lesson-title-text {
+  min-width: 0;
+}
+
+/* InfoStack: vertically stacked information with consistent spacing */
+.info-stack {
+  display: grid;
+  width: 100%;
+  gap: var(--component-stack-gap, 1rem);
+  align-content: start;
+}
+
+.info-stack > * {
+  min-width: 0;
+}
+
+/* CardGrid: variants define their own columns and visual treatment */
+.card-grid,
+.card-grid > * {
+  min-width: 0;
+}
+
+/* ContentCard: static and JavaScript-rendered card contract */
+.content-card,
+.interactive-card,
+.reference-card,
+.course-card {
+  min-width: 0;
+}
+
+/* Callout: role variants define color, border and spacing */
+.callout {
+  min-width: 0;
+}
+
+/* Modules and content primitives */
+
+.module {
+  position: relative;
+  padding: var(--space-7) 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.module:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.lesson-header {
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 0.7fr);
+  gap: var(--space-5);
+  align-items: end;
+  margin-bottom: var(--space-6);
+}
+
+.lesson-header h2 {
+  margin-bottom: 0;
+  font-size: var(--type-h2);
+}
+
+.lesson-header .lesson-title {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.18rem;
+}
+
+.lesson-number {
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 1.12em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.lesson-title-text {
+  min-width: 0;
+  font-size: 0.9em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.section-code {
+  margin-bottom: 0.75rem;
+}
+
+.lesson-goal {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-left: 2px solid var(--orange);
+  color: var(--muted);
+  background: var(--orange-dim);
+  font-size: var(--type-small);
+  line-height: 1.7;
+}
+
+.lesson-goal span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--orange);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.lead-copy {
+  color: var(--text-soft);
+  font-size: var(--type-lead);
+  line-height: 2;
+}
+
+.term-title {
+  margin-bottom: 1.25rem;
+}
+
+.term-en {
+  margin-bottom: 0.18rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+
+.term-ja {
+  margin-bottom: 0.75rem;
+  color: var(--cyan);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.subsection {
+  margin-top: var(--space-7);
+  margin-inline-start: clamp(0.6rem, 1.5vw, 1.25rem);
+  padding-inline-start: clamp(1rem, 2.2vw, 1.75rem);
+  border-inline-start: 1px solid rgba(89, 214, 232, 0.3);
+}
+
+.subsection h3 {
+  margin-bottom: 1.1rem;
+  font-size: var(--type-h3);
+}
+
+.subsection h4 {
+  font-size: var(--type-h4);
+}
+
+.subsection .subsection {
+  margin-top: var(--space-5);
+  margin-inline-start: 0.75rem;
+  border-inline-start-color: var(--line);
+}
+
+.subsection .subsection > h3 {
+  font-size: var(--type-h4);
+}
+
+.subsection h3 small,
+.limits-grid h3 small,
+.two-term-grid h3 small,
+.concept-columns h3 small,
+.zones-copy h3 small,
+.guns-grid h3 small {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--cyan);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+.eyebrow {
+  margin-bottom: 0.55rem;
+  color: var(--muted);
+}
+
+.callout-summary {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: var(--space-4);
+  align-items: start;
+  margin-top: var(--space-6);
+  padding: 1.2rem 1.3rem;
+  border: 1px solid rgba(89, 214, 232, 0.24);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(100deg, var(--cyan-dim), rgba(8, 20, 30, 0.2));
+}
+
+.callout-summary strong {
+  color: var(--cyan-bright);
+  font-size: 0.8rem;
+}
+
+.callout-summary p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: var(--type-small);
+  line-height: 1.75;
+}
+
+.note-box,
+.callout-warning,
+.callout-advanced,
+.callout-source,
+.callout-scope {
+  padding: 1rem 1.2rem;
+  border-left: 3px solid var(--cyan);
+  background: var(--cyan-dim);
+}
+
+.note-box span,
+.callout-warning span,
+.callout-advanced span,
+.callout-scope span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.note-box p,
+.callout-warning p,
+.callout-advanced p,
+.callout-scope p {
+  margin: 0;
+  font-size: var(--type-small);
+  line-height: 1.8;
+}
+
+.callout-warning {
+  border-left-color: var(--orange);
+  background: var(--orange-dim);
+}
+
+.callout-warning span {
+  color: var(--orange);
+}
+
+.callout-advanced {
+  margin-top: 1.5rem;
+  border-left-color: var(--blue);
+  background: rgba(79, 142, 232, 0.1);
+}
+
+.callout-advanced span {
+  color: #8ab8fa;
+}

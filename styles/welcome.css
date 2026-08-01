@@ -1,0 +1,200 @@
+/* =========================================================
+   BFM STARTER — welcome sequence
+   Scroll-led Apple-style introduction before PART 1
+   ========================================================= */
+
+/* Scroll-led welcome before PART 1 */
+.welcome-sequence {
+  position: relative;
+  min-height: 220svh;
+  overflow: clip;
+  border-bottom: 1px solid var(--line-soft);
+  background:
+    radial-gradient(circle at 50% 45%, rgba(89, 214, 232, 0.1), transparent 32%),
+    var(--bg);
+  isolation: isolate;
+}
+
+.welcome-sticky {
+  position: sticky;
+  top: var(--header-height);
+  display: grid;
+  height: calc(100svh - var(--header-height));
+  place-items: center;
+  overflow: hidden;
+}
+
+.welcome-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, transparent 49.9%, rgba(89, 214, 232, 0.055) 50%, transparent 50.1%),
+    linear-gradient(transparent 49.9%, rgba(89, 214, 232, 0.055) 50%, transparent 50.1%);
+  background-size: min(12vw, 150px) min(12vw, 150px);
+  mask-image: radial-gradient(circle at center, #000, transparent 72%);
+  opacity: 0.8;
+}
+
+.welcome-stage {
+  position: relative;
+  width: min(1120px, calc(100% - 2rem));
+  min-height: min(56vh, 560px);
+}
+
+.welcome-message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  margin: 0;
+  padding: 1rem;
+  place-items: center;
+  color: var(--text);
+  font-weight: 780;
+  letter-spacing: -0.055em;
+  line-height: 1.18;
+  text-align: center;
+  text-wrap: balance;
+  will-change: opacity, transform;
+}
+
+.welcome-message-primary {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.12em;
+  font-size: clamp(3rem, 7.4vw, 7.5rem);
+  opacity: 1;
+}
+
+.welcome-message-primary > span {
+  display: block;
+}
+
+.welcome-message-secondary {
+  max-width: 17ch;
+  margin-inline: auto;
+  font-size: clamp(2rem, 5.2vw, 5.2rem);
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+}
+
+.welcome-scroll-cue {
+  position: absolute;
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  left: 50%;
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  place-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  transform: translateX(-50%);
+}
+
+.welcome-scroll-cue span {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(var(--cyan), transparent);
+}
+
+html:not(.js-enabled) .welcome-sequence {
+  min-height: auto;
+}
+
+html:not(.js-enabled) .welcome-sticky {
+  position: relative;
+  top: auto;
+  height: auto;
+  min-height: calc(100svh - var(--header-height));
+  padding: clamp(5rem, 12vh, 8rem) 1rem;
+}
+
+html:not(.js-enabled) .welcome-stage {
+  display: grid;
+  gap: clamp(3rem, 10vh, 6rem);
+  min-height: 0;
+}
+
+html:not(.js-enabled) .welcome-message {
+  position: static;
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .welcome-sequence {
+    min-height: 200svh;
+  }
+
+  .welcome-stage {
+    min-height: 62vh;
+  }
+
+  .welcome-message-primary {
+    font-size: clamp(2.2rem, 10.5vw, 3.5rem);
+  }
+
+  .welcome-message-secondary {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0.25rem;
+    font-size: clamp(1.55rem, 7.2vw, 2.6rem);
+  }
+}
+
+@media (max-width: 940px) and (orientation: landscape) and (max-height: 600px) {
+  .welcome-sequence {
+    min-height: 180svh;
+  }
+
+  .welcome-stage {
+    min-height: 50vh;
+  }
+
+  .welcome-message-primary {
+    font-size: clamp(2rem, 7vw, 3.25rem);
+  }
+
+  .welcome-message-secondary {
+    max-width: min(22ch, 100%);
+    font-size: clamp(1.4rem, 4.5vw, 2.25rem);
+  }
+
+  .welcome-scroll-cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-sequence {
+    min-height: auto;
+  }
+
+  .welcome-sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: calc(100svh - var(--header-height));
+    padding: clamp(5rem, 12vh, 8rem) 1rem;
+  }
+
+  .welcome-stage {
+    display: grid;
+    gap: clamp(3rem, 10vh, 6rem);
+    min-height: 0;
+  }
+
+  .welcome-message {
+    position: static;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .welcome-scroll-cue {
+    display: none;
+  }
+}

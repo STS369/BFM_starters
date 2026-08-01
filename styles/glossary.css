@@ -1,0 +1,137 @@
+/* =========================================================
+   BFM STARTER — glossary
+   Search controls, glossary cards and reference metadata
+   ========================================================= */
+
+/* Glossary */
+
+.glossary-search {
+  position: sticky;
+  top: calc(var(--header-height) + 10px);
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(9, 23, 34, 0.96);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+.glossary-search label {
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.glossary-search > div {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--ink-950);
+}
+
+.glossary-search > div > span {
+  padding-left: 0.8rem;
+  color: var(--cyan);
+  font-size: 1.2rem;
+}
+
+.glossary-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.8rem;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  background: transparent;
+  font-size: 0.8rem;
+}
+
+.glossary-search kbd {
+  margin-right: 0.6rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--muted);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.glossary-search > p {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.glossary-search > p strong {
+  color: var(--cyan);
+}
+
+.glossary-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.reference-card {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.reference-card h3 {
+  margin: 0 0 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.reference-card .glossary-ja {
+  margin-bottom: 0.65rem;
+  color: var(--cyan);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.reference-card .glossary-desc {
+  color: var(--muted);
+  font-size: 0.73rem;
+  line-height: 1.75;
+}
+
+.glossary-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.glossary-meta span {
+  color: var(--muted);
+  font-size: 0.59rem;
+}
+
+.glossary-meta a {
+  flex: 0 0 auto;
+  font-size: 0.65rem;
+}
+
+.empty-state,
+.noscript-glossary {
+  padding: 1.5rem;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  text-align: center;
+}

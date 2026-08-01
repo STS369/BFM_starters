@@ -1,0 +1,56 @@
+/* =========================================================
+   BFM STARTER — design tokens
+   ========================================================= */
+
+:root {
+  color-scheme: dark;
+  --ink-950: #050c13;
+  --ink-900: #08131f;
+  --ink-850: #0b1824;
+  --ink-800: #0e1d2a;
+  --ink-750: #122432;
+  --ink-700: #18303f;
+  --line: #274353;
+  --line-soft: rgba(130, 175, 194, 0.16);
+  --text: #f4f8fa;
+  --text-soft: #c6d2d8;
+  --muted: #8297a2;
+  --cyan: #59d6e8;
+  --cyan-bright: #88ecf8;
+  --cyan-dim: rgba(89, 214, 232, 0.14);
+  --blue: #4f8ee8;
+  --orange: #f4a261;
+  --orange-dim: rgba(244, 162, 97, 0.13);
+  --red: #ff6b5f;
+  --green: #71dfb1;
+  --surface: rgba(13, 29, 42, 0.8);
+  --surface-solid: #0d1d2a;
+  --surface-raised: #112532;
+  --header-height: 72px;
+  --page-max: 1440px;
+  --content-max: 970px;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4.5rem;
+  --space-8: 7rem;
+  --font-sans: "Inter", "Noto Sans JP", "Yu Gothic UI", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", "Roboto Mono", Consolas, monospace;
+  /* Semantic type roles: content text never falls below --type-small. */
+  --type-display: clamp(3.2rem, 6.1vw, 6.7rem);
+  --type-subtitle: clamp(1.35rem, 2.5vw, 2.25rem);
+  --type-h2: clamp(2rem, 4.1vw, 3.55rem);
+  --type-h3: clamp(1.4rem, 2.7vw, 2.15rem);
+  --type-h4: clamp(1.05rem, 1.45vw, 1.3rem);
+  --type-lead: clamp(1.0625rem, 1.8vw, 1.25rem);
+  --type-body: 1rem;
+  --type-small: 0.875rem;
+  --type-label: 0.6875rem;
+}

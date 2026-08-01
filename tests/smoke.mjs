@@ -216,6 +216,52 @@ async function run() {
         equalSpacing: boxes.every(Boolean) && Math.abs((boxes[1].top - boxes[0].bottom) - (boxes[2].top - boxes[1].bottom)) <= 1
       };
     })(),
+    componentArchitecture: (() => {
+      const lessonHeaders = [...document.querySelectorAll(".lesson-header")];
+      const callouts = [...document.querySelectorAll(".callout")];
+      const cardGrids = [...document.querySelectorAll(".card-grid")];
+      const stylesheetOrder = [...document.querySelectorAll('link[rel="stylesheet"]')]
+        .map((link) => new URL(link.href).pathname.split("/").slice(-2).join("/"));
+      const expectedStylesheetOrder = [
+        "styles/tokens.css",
+        "styles/base.css",
+        "styles/layout.css",
+        "styles/components.css",
+        "styles/welcome.css",
+        "styles/lessons.css",
+        "styles/quiz.css",
+        "styles/glossary.css",
+        "styles/responsive.css"
+      ];
+      return {
+        componentStylesheet: stylesheetOrder.includes("styles/components.css"),
+        stylesheetOrder,
+        layeredStylesheets: expectedStylesheetOrder.every((name, index) => stylesheetOrder[index] === name),
+        lessonHeaders: lessonHeaders.length,
+        lessonStructureValid: lessonHeaders.every((header) =>
+          header.classList.contains("module-header") &&
+          Boolean(header.querySelector(".lesson-title .lesson-number")) &&
+          Boolean(header.querySelector(".lesson-title .lesson-title-text")) &&
+          Boolean(header.querySelector(".lesson-goal"))
+        ),
+        infoStackItems: document.querySelectorAll(".info-stack > p").length,
+        callouts: callouts.length,
+        calloutVariantsValid: callouts.every((callout) => [...callout.classList].some((name) => name.startsWith("callout-"))),
+        cardGrids: cardGrids.length,
+        quizCards: document.querySelectorAll(".quiz-card.content-card.interactive-card").length,
+        glossaryCards: document.querySelectorAll(".glossary-card.content-card.reference-card").length,
+        courseCards: document.querySelectorAll(".course-choice.content-card.course-card").length,
+        scriptEntry: [...document.scripts].some((script) =>
+          !script.type && new URL(script.src).pathname.endsWith("/scripts/main.js")
+        ),
+        scriptTags: [...document.scripts]
+          .map((script) => script.src && new URL(script.src).pathname)
+          .filter((pathname) => pathname && pathname.includes("/scripts/") && pathname.endsWith(".js")),
+        scriptResources: [...new Set(performance.getEntriesByType("resource")
+          .map((entry) => new URL(entry.name).pathname)
+          .filter((pathname) => pathname.includes("/scripts/") && pathname.endsWith(".js")))]
+      };
+    })(),
     decisionCycle: (() => {
       const items = [...document.querySelectorAll(".triangle-flow .flow-node")];
       const returnPath = document.querySelector(".triangle-flow > svg > path:last-of-type");
@@ -448,6 +494,17 @@ async function run() {
       basics.creatorNote.requestText ===
         "お願い本サイトは初心者が初心者のためにつくりました。間違っている箇所があるかもしれませんが、ご容赦ください。",
     JSON.stringify(basics.creatorNote)
+  );
+  record(
+    "共通コンポーネント契約を既存UIへ適用",
+    basics.componentArchitecture.componentStylesheet && basics.componentArchitecture.layeredStylesheets &&
+      basics.componentArchitecture.lessonHeaders === 18 &&
+      basics.componentArchitecture.lessonStructureValid && basics.componentArchitecture.infoStackItems === 3 &&
+      basics.componentArchitecture.callouts >= 20 && basics.componentArchitecture.calloutVariantsValid &&
+      basics.componentArchitecture.cardGrids >= 10 && basics.componentArchitecture.quizCards === 12 &&
+      basics.componentArchitecture.glossaryCards >= 45 && basics.componentArchitecture.courseCards === 2 &&
+      basics.componentArchitecture.scriptEntry && basics.componentArchitecture.scriptTags.length === 11,
+    JSON.stringify(basics.componentArchitecture)
   );
   record(
     "判断サイクルは01→02→03→01",
@@ -808,6 +865,28 @@ async function run() {
   await evaluate(socket, "window.scrollTo(0, 0)");
   await wait(100);
   await captureScreenshot(socket, "bfm-mobile-cdp.png");
+  if (process.env.SCREENSHOT_DIR) {
+    const mobileScreenshotTargets = [
+      ["overview", "bfm-mobile-overview.png"],
+      ["circle-fight", "bfm-mobile-circle-fight.png"],
+      ["glossary", "bfm-mobile-glossary.png"],
+      ["next", "bfm-mobile-next.png"]
+    ];
+    const previousScrollBehavior = await evaluate(socket, "document.documentElement.style.scrollBehavior");
+    await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
+    for (const [id, filename] of mobileScreenshotTargets) {
+      await evaluate(socket, `(() => {
+        const target = document.querySelector("#${id}");
+        const headerOffset = document.querySelector(".site-header").getBoundingClientRect().height + 16;
+        window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - headerOffset, left: 0 });
+      })()`);
+      await wait(100);
+      await captureScreenshot(socket, filename);
+    }
+    await evaluate(socket, `document.documentElement.style.scrollBehavior = ${JSON.stringify(previousScrollBehavior)}`);
+    await evaluate(socket, "window.scrollTo(0, 0)");
+    await wait(100);
+  }
   const mobile = await evaluate(socket, `(() => {
     const button = document.querySelector("#menu-toggle");
     button.click();
@@ -847,6 +926,91 @@ async function run() {
     mobile.heroStatsRemoved && mobile.speedButtonsWithinViewport &&
       mobile.flowClearance.arrow >= 8 && mobile.flowClearance.heading >= 56,
     JSON.stringify(mobile)
+  );
+
+  const phoneLayouts = [];
+  for (const width of [320, 360, 375, 390, 430]) {
+    await setViewport(socket, width, 812);
+    await evaluate(socket, "window.scrollTo(0, 0)");
+    await wait(80);
+    phoneLayouts.push(await evaluate(socket, `(() => {
+      const singleColumnSelectors = [
+        ".roadmap-grid", ".principle-grid", ".triad", ".limits-grid",
+        ".concept-columns", ".zones-copy", ".two-term-grid", ".guns-grid",
+        ".circle-compare", ".comparison-cards", ".course-choice-grid",
+        ".glossary-list", ".quiz-options", ".metric-grid"
+      ];
+      const gridElements = singleColumnSelectors.flatMap((selector) => [...document.querySelectorAll(selector)]);
+      const touchTargets = [
+        document.querySelector("#menu-toggle"),
+        ...document.querySelectorAll("[data-speed-region], .quiz-option, .quiz-submit")
+      ].filter((element) => getComputedStyle(element).display !== "none");
+      const withinViewport = (element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.left >= -1 && rect.right <= innerWidth + 1;
+      };
+      const welcomeMetrics = [...document.querySelectorAll(".welcome-message")].map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          className: element.className,
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          left: rect.left,
+          right: rect.right
+        };
+      });
+      return {
+        width: innerWidth,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        headerWithinViewport: withinViewport(document.querySelector(".site-header")),
+        welcomeFits: welcomeMetrics.every((item) =>
+          item.scrollWidth <= item.clientWidth + 1 && item.left >= -1 && item.right <= innerWidth + 1
+        ),
+        welcomeMetrics,
+        lessonTitlesFit: [...document.querySelectorAll(".lesson-title-text")].every((element) =>
+          element.scrollWidth <= element.clientWidth + 1 && withinViewport(element)
+        ),
+        mobileColumns: gridElements.every((element) =>
+          getComputedStyle(element).gridTemplateColumns.trim().split(/\\s+/).length === 1
+        ),
+        indexHidden: getComputedStyle(document.querySelector(".section-index")).display === "none" &&
+          getComputedStyle(document.querySelector(".index-resizer")).display === "none",
+        touchTargets: touchTargets.every((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.width >= 44 && rect.height >= 44 && withinViewport(element);
+        }),
+        tableWrapsWithinViewport: [...document.querySelectorAll(".table-wrap")].every(withinViewport)
+      };
+    })()`));
+  }
+  record(
+    "320〜430pxで主要レイアウトと操作領域が崩れない",
+    phoneLayouts.every((layout) => layout.overflow <= 1 && layout.headerWithinViewport &&
+      layout.welcomeFits && layout.lessonTitlesFit && layout.mobileColumns && layout.indexHidden &&
+      layout.touchTargets && layout.tableWrapsWithinViewport),
+    JSON.stringify(phoneLayouts)
+  );
+
+  await setViewport(socket, 844, 390);
+  await evaluate(socket, "window.scrollTo(0, 0)");
+  await wait(80);
+  const phoneLandscape = await evaluate(socket, `(() => {
+    const menu = document.querySelector("#menu-toggle");
+    const menuRect = menu.getBoundingClientRect();
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      menuVisible: getComputedStyle(menu).display !== "none" && menuRect.width >= 44 && menuRect.height >= 44,
+      indexHidden: getComputedStyle(document.querySelector(".section-index")).display === "none" &&
+        getComputedStyle(document.querySelector(".index-resizer")).display === "none",
+      welcomeFits: [...document.querySelectorAll(".welcome-message")].every((element) =>
+        element.scrollWidth <= element.clientWidth + 1
+      )
+    };
+  })()`);
+  record(
+    "スマホ横向きでもウェルカムとナビゲーションが崩れない",
+    phoneLandscape.overflow <= 1 && phoneLandscape.menuVisible && phoneLandscape.indexHidden && phoneLandscape.welcomeFits,
+    JSON.stringify(phoneLandscape)
   );
 
   await setViewport(socket, 320, 568);

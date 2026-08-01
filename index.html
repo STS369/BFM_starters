@@ -14,7 +14,15 @@
   <meta property="og:image" content="assets/og-bfm.svg">
   <!-- 公開URL決定後に canonical と og:url を追加してください。 -->
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/welcome.css">
+  <link rel="stylesheet" href="styles/lessons.css">
+  <link rel="stylesheet" href="styles/quiz.css">
+  <link rel="stylesheet" href="styles/glossary.css">
+  <link rel="stylesheet" href="styles/responsive.css">
 </head>
 <body>
   <a class="skip-link" href="#main-content">本文へスキップ</a>
@@ -43,7 +51,7 @@
       <div class="welcome-sticky">
         <div class="welcome-grid" aria-hidden="true"></div>
         <div class="welcome-stage">
-          <p class="welcome-message welcome-message-primary" id="welcome-title" data-welcome-step="1">ようこそBFM Starterへ</p>
+          <p class="welcome-message welcome-message-primary" id="welcome-title" data-welcome-step="1"><span>ようこそ</span><span>BFM Starterへ</span></p>
           <p class="welcome-message welcome-message-secondary" data-welcome-step="2">ここではドックファイトにおいて必要なBFMを学ぶことができます</p>
         </div>
         <p class="welcome-scroll-cue" aria-hidden="true"><span></span>SCROLL</p>
@@ -56,7 +64,7 @@
         <p class="kicker hero-part-label">PART 1:</p>
         <h1 id="hero-title"><span class="hero-title-main">BFMの基礎を、迷わず</span></h1>
         <p class="hero-definition">BFMを学び始めると、英語の専門用語や断片的な解説が先に現れ、<strong>何を、どの順番で理解すればよいか</strong>が見えにくくなります。</p>
-        <div class="creator-info">
+        <div class="creator-info info-stack">
           <p class="creator-note"><span>制作背景</span>このサイトは、製作者自身がBFMを学ぶ過程で、散在する用語や考え方を一つの流れに整理するためのまとめノートとして制作しました。同じようにBFMを学び始める人にも役立てばと思い公開しています。</p>
           <p class="hero-purpose"><span>サイトの目的</span>日本人の初心者が、定義・位置関係・エネルギーを順序立てて学び、出典を確かめながら、自分の言葉でBFMの基礎を説明できるようになることです。</p>
           <p class="creator-note creator-request"><span>お願い</span>本サイトは初心者が初心者のためにつくりました。間違っている箇所があるかもしれませんが、ご容赦ください。</p>
@@ -111,11 +119,11 @@
 
       <article class="learning-content">
         <section class="module" id="overview" data-section="BFMとは何か" aria-labelledby="overview-title">
-          <header class="module-header">
+          <header class="module-header lesson-header">
             <div>
-              <h2 class="numbered-module-title" id="overview-title"><span class="module-title-number">01:</span><span class="module-title-text">BFMとは何か</span></h2>
+              <h2 class="numbered-module-title lesson-title" id="overview-title"><span class="module-title-number lesson-number">01:</span><span class="module-title-text lesson-title-text">BFMとは何か</span></h2>
             </div>
-            <p class="learning-goal"><span>学習目標</span>BFMを「技の暗記」ではなく、相対位置を継続して整える判断の体系として説明できる。</p>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>BFMを「技の暗記」ではなく、相対位置を継続して整える判断の体系として説明できる。</p>
           </header>
           <div class="term-title">
             <p class="term-en">Basic Fighter Maneuvers</p>
@@ -128,7 +136,7 @@
             <p class="eyebrow">WHY BFM EXISTS</p>
             <h3>必要な位置を作り、相手には同じ条件を作らせない</h3>
             <p>目標は、単に「相手の後ろに見える場所」へ行くことではありません。距離・角度・接近率が使える範囲に収まる位置を作り、その関係を維持します。同時に、相手が同じ条件を得ることは難しくします。</p>
-            <div class="comparison-cards two-up purpose-comparison">
+            <div class="comparison-cards card-grid two-up purpose-comparison">
               <article><span class="compare-tag">CREATE</span><h4>自機の機会を作る</h4><p>相手との距離と角度を整え、次の判断に使える時間と空間を確保します。</p></article>
               <article><span class="compare-tag warning">DENY</span><h4>相手の機会を減らす</h4><p>相手の機首・飛行経路・エネルギーを見て、一方的に有利な条件を作らせません。</p></article>
             </div>
@@ -137,7 +145,7 @@
           <div class="subsection">
             <p class="eyebrow">WHAT TO MANAGE</p>
             <h3>読み続ける3つの判断軸</h3>
-            <div class="triad">
+            <div class="triad card-grid">
               <article><span>01</span><h4>Range</h4><p>2機の距離。近すぎるか、遠すぎるかを見ます。</p></article>
               <article><span>02</span><h4>Angles</h4><p>位置と向きの関係。1種類の角度ではありません。</p></article>
               <article><span>03</span><h4>Closure</h4><p>距離が変化する速さ。接近・一定・離隔を見ます。</p></article>
@@ -157,16 +165,16 @@
               </ol>
               <p><strong>03から01へ戻る</strong><span>機動後の状況を、もう一度観察します。</span></p>
             </div>
-            <div class="warning-box"><span>注意</span><p>どれか1つだけでは判断できません。後方に見えても、距離が詰まりすぎていたり、相手がこちらへ向き直れる角度なら、維持できる位置とは限りません。</p></div>
+            <div class="warning-box callout callout-warning"><span>注意</span><p>どれか1つだけでは判断できません。後方に見えても、距離が詰まりすぎていたり、相手がこちらへ向き直れる角度なら、維持できる位置とは限りません。</p></div>
           </div>
 
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>BFMは固定手順ではありません。観察・予測・機動を循環させ、変化する2機の関係を整えるために存在します。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>BFMは固定手順ではありません。観察・予測・機動を循環させ、変化する2機の関係を整えるために存在します。</p></div>
         </section>
 
         <section class="module" id="roadmap" data-section="基礎の学習順" aria-labelledby="roadmap-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="roadmap-title"><span class="module-title-number">02:</span><span class="module-title-text">基礎講座の進め方</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>このページで身につける基礎を、5つの段階で把握する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="roadmap-title"><span class="module-title-number lesson-number">02:</span><span class="module-title-text lesson-title-text">基礎講座の進め方</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>このページで身につける基礎を、5つの段階で把握する。</p>
           </header>
           <p class="lead-copy">用語をばらばらに暗記せず、「目的」から「確認問題」まで順に進みます。各章の最後にある要点を、自分の言葉で説明できるか確かめてください。</p>
           <ol class="fundamentals-path">
@@ -176,15 +184,15 @@
             <li><span>04</span><div><h3>流れを判断する</h3><p>Pursuit・Overshoot・Circle・運動面。</p></div><a href="#pursuit">追跡へ</a></li>
             <li><span>05</span><div><h3>理解を確認する</h3><p>要点を整理し、12問の確認問題に答える。</p></div><a href="#quiz">確認問題へ</a></li>
           </ol>
-          <div class="checkpoint"><strong>進め方</strong><p>基礎講座を最後まで終えたあとに、ページ最下部で次に学ぶ講座を選びます。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>進め方</strong><p>基礎講座を最後まで終えたあとに、ページ最下部で次に学ぶ講座を選びます。</p></div>
         </section>
 
         <section class="module" id="principles" data-section="BFMの3原則" aria-labelledby="principles-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="principles-title"><span class="module-title-number">03:</span><span class="module-title-text">BFMの3原則</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>視認・相対関係・エネルギーの3視点を、具体例と結びつける。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="principles-title"><span class="module-title-number lesson-number">03:</span><span class="module-title-text lesson-title-text">BFMの3原則</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>視認・相対関係・エネルギーの3視点を、具体例と結びつける。</p>
           </header>
-          <div class="principle-grid">
+          <div class="principle-grid card-grid">
             <article class="principle-card">
               <span class="card-number">01</span>
               <h3>Lose sight,<br>lose the fight.</h3>
@@ -207,13 +215,13 @@
               <div class="example"><b>例</b><p>いま射撃機会が生まれるなら速度を使う。まだ距離があるなら、旋回を緩めてエネルギーを温存する。</p></div>
             </article>
           </div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>「見続ける」「相手を基準に考える」「エネルギーと機首位置を交換する」。この3つが、以降の比較や操作結果を読む軸です。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>「見続ける」「相手を基準に考える」「エネルギーと機首位置を交換する」。この3つが、以降の比較や操作結果を読む軸です。</p></div>
         </section>
 
         <section class="module" id="energy" data-section="旋回とエネルギー" aria-labelledby="energy-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="energy-title"><span class="module-title-number">04:</span><span class="module-title-text">旋回とエネルギー</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>操縦入力・迎角・揚力・抗力・速度のつながりを説明できる。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="energy-title"><span class="module-title-number lesson-number">04:</span><span class="module-title-text lesson-title-text">旋回とエネルギー</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>操縦入力・迎角・揚力・抗力・速度のつながりを説明できる。</p>
           </header>
           <div class="force-layout">
             <div>
@@ -288,15 +296,15 @@
               </dl>
             </div>
           </div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>強い旋回は無料ではありません。低速では失速、高速では大きな半径、中間では持続性——速度域ごとの交換条件を意識します。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>強い旋回は無料ではありません。低速では失速、高速では大きな半径、中間では持続性——速度域ごとの交換条件を意識します。</p></div>
         </section>
 
         <section class="module" id="turn-performance" data-section="Turn RateとRadius" aria-labelledby="turn-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="turn-title"><span class="module-title-number">05:</span><span class="module-title-text">Turn Rate / Radius</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>「向きが変わる速さ」と「円の小ささ」を区別する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="turn-title"><span class="module-title-number lesson-number">05:</span><span class="module-title-text lesson-title-text">Turn Rate / Radius</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>「向きが変わる速さ」と「円の小ささ」を区別する。</p>
           </header>
-          <div class="two-term-grid">
+          <div class="two-term-grid card-grid">
             <article><span class="term-index">A</span><h3>Turn Rate <small>旋回率</small></h3><p>1秒間に機首方向が何度変わるか。単位例はdegrees per second（度毎秒）。高いほど旋回円上を速く進みます。</p></article>
             <article><span class="term-index">B</span><h3>Turn Radius <small>旋回半径</small></h3><p>旋回円の中心から機体までの距離。小さいほど狭い空間で向きを変えられます。高速では大きくなる場合があります。</p></article>
           </div>
@@ -308,19 +316,19 @@
           <div class="subsection">
             <p class="eyebrow">ENERGY CHECK</p>
             <h3>瞬間旋回と持続旋回を分ける</h3>
-            <div class="two-term-grid">
+            <div class="two-term-grid card-grid">
               <article><span class="term-index">I</span><h4>Instantaneous Rate <small>瞬間旋回率</small></h4><p>現在の速度から一時的に作れる高い旋回率。多くの場合は速度・高度として持つエネルギーを消費します。</p></article>
               <article><span class="term-index">S</span><h4>Sustained Rate <small>持続旋回率</small></h4><p>速度と高度を保ちながら続けられる旋回率。瞬間値より低くても、関係を長く作り続けられます。</p></article>
             </div>
             <p class="term-note"><strong>Specific Energy Rate（Ps）</strong>は、機動中にエネルギーが増えているか、減っているかを表す考え方です。ここでは機種固有の数値を使わず、「いまの旋回を続けられるか」を判断する言葉として扱います。<a class="source-marker" href="#ref-1" aria-label="参考資料1へ">[1]</a></p>
           </div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Rateは「時間あたりの角度」、Radiusは「円の大きさ」。One-CircleとTwo-Circleでは、重視される側が変わります。<a class="source-marker" href="#ref-3" aria-label="参考資料3へ">[3]</a></p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Rateは「時間あたりの角度」、Radiusは「円の大きさ」。One-CircleとTwo-Circleでは、重視される側が変わります。<a class="source-marker" href="#ref-3" aria-label="参考資料3へ">[3]</a></p></div>
         </section>
 
         <section class="module" id="geometry" data-section="2機の位置関係" aria-labelledby="geometry-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="geometry-title"><span class="module-title-number">06:</span><span class="module-title-text">2機の位置関係</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>Range・Aspect Angle・HCA・Closureを混同せず、現在と次の変化を読み取る。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="geometry-title"><span class="module-title-number lesson-number">06:</span><span class="module-title-text lesson-title-text">2機の位置関係</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>Range・Aspect Angle・HCA・Closureを混同せず、現在と次の変化を読み取る。</p>
           </header>
           <div class="concept-columns geometry-concepts">
             <article><h3>Range <small>距離</small></h3><p>2機の直線距離。遠すぎれば攻撃できず、近すぎれば追い越す可能性があります。距離だけで有利・不利は決まりません。</p></article>
@@ -354,13 +362,13 @@
             </div>
           </div>
           <p class="geometry-table-note">Aspect Angleだけで有利・不利は決まりません。Range・HCA・ATA・Closureを一緒に読みます。</p>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Aspect Angleは位置、HCAは進行方向の差、ATAは機首と視線の差です。距離と接近率も同時に読み、数秒後の関係を予測します。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Aspect Angleは位置、HCAは進行方向の差、ATAは機首と視線の差です。距離と接近率も同時に読み、数秒後の関係を予測します。</p></div>
         </section>
 
         <section class="module" id="turn-circle" data-section="Turn Circle" aria-labelledby="turn-circle-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="turn-circle-title"><span class="module-title-number">07:</span><span class="module-title-text">Turning Room / Circle</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>向きを変えるために使える空間と、機体が実際に描く旋回円を区別する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="turn-circle-title"><span class="module-title-number lesson-number">07:</span><span class="module-title-text lesson-title-text">Turning Room / Circle</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>向きを変えるために使える空間と、機体が実際に描く旋回円を区別する。</p>
           </header>
           <div class="topic-heading"><p class="eyebrow">CORE CONCEPTS</p><h3>Turning Roomを理解する3つの基本概念</h3></div>
           <div class="zones-copy">
@@ -374,16 +382,16 @@
             <li><span>02</span><div><b>使える空間を探す</b><small>左右だけでなく、上下を含むTurning Roomを見ます。</small></div></li>
             <li><span>03</span><div><b>性能と交換条件を選ぶ</b><small>必要なRate／Radiusと、消費できるエネルギーを考えます。</small></div></li>
           </ol>
-          <div class="warning-box"><span>注意</span><p>Turning Roomは自機だけのものではありません。空間を作れば相手にも利用される可能性があるため、2機の向きとClosureを再評価します。</p></div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Turning Roomは向きを変えるために使える空間、Turn Circleは現在の速度と荷重から生じる旋回の形です。<a class="source-marker" href="#ref-1" aria-label="参考資料1へ">[1]</a></p></div>
+          <div class="warning-box callout callout-warning"><span>注意</span><p>Turning Roomは自機だけのものではありません。空間を作れば相手にも利用される可能性があるため、2機の向きとClosureを再評価します。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Turning Roomは向きを変えるために使える空間、Turn Circleは現在の速度と荷重から生じる旋回の形です。<a class="source-marker" href="#ref-1" aria-label="参考資料1へ">[1]</a></p></div>
         </section>
 
         <section class="module" id="pursuit" data-section="Pursuit Curves" aria-labelledby="pursuit-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="pursuit-title"><span class="module-title-number">08:</span><span class="module-title-text">Pursuit Curves</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>Lead・Pure・Lagを、機首を向ける場所とClosureの変化で比較する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="pursuit-title"><span class="module-title-number lesson-number">08:</span><span class="module-title-text lesson-title-text">Pursuit Curves</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>Lead・Pure・Lagを、機首を向ける場所とClosureの変化で比較する。</p>
           </header>
-          <div class="comparison-cards three-up pursuit-comparison">
+          <div class="comparison-cards card-grid three-up pursuit-comparison">
             <article>
               <p class="term-en">Lead Pursuit</p><p class="term-ja">前方追跡</p>
               <p>敵機の進行方向の<strong>前</strong>へ機首を向けます。</p>
@@ -404,41 +412,41 @@
             <div class="reference-image-canvas reference-image-tall"><img src="assets/reference-usn-pursuit-curves.png" alt="旋回中の目標に対し、機首を目標の進行方向より前、目標そのもの、後方へ向けるLead・Pure・Lagの3種類の追跡を比較した図" loading="lazy"></div>
             <figcaption class="compact-citation"><a class="source-marker" href="#ref-5" aria-label="参考資料5へ">[5]</a></figcaption>
           </figure>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Leadは距離を詰め、Lagは詰まり方を抑え、Pureは相手そのものへ向けます。状況に応じて連続的に使い分けます。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Leadは距離を詰め、Lagは詰まり方を抑え、Pureは相手そのものへ向けます。状況に応じて連続的に使い分けます。</p></div>
         </section>
 
         <section class="module" id="overshoot" data-section="Overshoot" aria-labelledby="overshoot-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="overshoot-title"><span class="module-title-number">09:</span><span class="module-title-text">Overshoot</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>距離が詰まりすぎる原因と、相手の飛行経路を横切る結果をClosure管理と結びつける。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="overshoot-title"><span class="module-title-number lesson-number">09:</span><span class="module-title-text lesson-title-text">Overshoot</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>距離が詰まりすぎる原因と、相手の飛行経路を横切る結果をClosure管理と結びつける。</p>
           </header>
           <p class="lead-copy">Overshoot（オーバーシュート）は、接近しすぎたり相手の飛行経路を越えたりして、有利な後方位置を保てなくなることです。大きすぎるClosure、長すぎるLead、高すぎる速度、相手の急旋回への遅れ、距離と角度の管理失敗が主な原因です。</p>
-          <div class="comparison-cards two-up overshoot-comparison">
+          <div class="comparison-cards card-grid two-up overshoot-comparison">
             <article><span class="risk-tag">CAUSE</span><p class="term-en">EXCESS CLOSURE</p><h3>距離が急に詰まる</h3><p>Leadを長く使う、高い速度差を残すなどにより、相手との間隔を維持できなくなります。</p><small>見るもの：Rangeの変化とClosure</small></article>
             <article><span class="risk-tag critical">RESULT</span><p class="term-en">FLIGHT-PATH OVERSHOOT</p><h3>飛行経路を横切る</h3><p>相手が進むと予測される経路を通過し、安定した追跡位置を失う状態です。</p><small>見るもの：相手の飛行経路と自機の機首位置</small></article>
           </div>
-          <div class="warning-box"><span>判断</span><p>距離が急に詰まり始めたら、相手の飛行経路を越えてから対応するのではなく、Lead・速度・旋回の強さを早めに再評価します。</p></div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Overshootは速度だけの問題ではありません。Range・Angles・Closureと追跡方法の組み合わせで起こります。<a class="source-marker" href="#ref-4" aria-label="参考資料4へ">[4]</a></p></div>
+          <div class="warning-box callout callout-warning"><span>判断</span><p>距離が急に詰まり始めたら、相手の飛行経路を越えてから対応するのではなく、Lead・速度・旋回の強さを早めに再評価します。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Overshootは速度だけの問題ではありません。Range・Angles・Closureと追跡方法の組み合わせで起こります。<a class="source-marker" href="#ref-4" aria-label="参考資料4へ">[4]</a></p></div>
         </section>
 
         <section class="module" id="alignment" data-section="Turn Circle Alignment" aria-labelledby="alignment-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="alignment-title"><span class="module-title-number">10:</span><span class="module-title-text">Circle Alignment</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>同じ方向へ旋回していても、旋回円が一致しないことを認識する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="alignment-title"><span class="module-title-number lesson-number">10:</span><span class="module-title-text lesson-title-text">Circle Alignment</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>同じ方向へ旋回していても、旋回円が一致しないことを認識する。</p>
           </header>
-          <div class="comparison-cards two-up alignment-comparison">
+          <div class="comparison-cards card-grid two-up alignment-comparison">
             <article><span class="compare-tag">ALIGNED</span><h3>中心がおおむね一致</h3><p>相対運動を読みやすく、安定した追跡状態を作りやすい状態です。</p><ol class="mini-flow"><li>見かけの動きを観察</li><li>旋回円の位置を推定</li><li>追跡状態を再評価</li></ol></article>
             <article><span class="compare-tag warning">MISALIGNED</span><h3>中心または旋回面がずれる</h3><p>同じ方向へ旋回していても、上下動や横ずれが大きく見えることがあります。</p><ol class="mini-flow"><li>ずれを認識</li><li>RangeとClosureを確認</li><li>引き続けるか再判断</li></ol></article>
           </div>
-          <div class="advanced-box"><span>ADVANCED</span><p>Misalignmentは常に不利とは限りません。相手が自機前方へ移動し、追加の大きなエネルギー消費なしに機会が生まれる場合もあります。初心者の目標は、まず「ずれている」と認識することです。</p></div>
+          <div class="advanced-box callout callout-advanced"><span>ADVANCED</span><p>Misalignmentは常に不利とは限りません。相手が自機前方へ移動し、追加の大きなエネルギー消費なしに機会が生まれる場合もあります。初心者の目標は、まず「ずれている」と認識することです。</p></div>
           <p class="term-note"><strong>extend（延伸する）</strong>：一時的に敵機から距離を取り、位置関係やエネルギーを整えること。</p>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>同じ右旋回でも円は一致しません。見かけの上下動を手掛かりに、必要なら引き続けず、距離と位置を整えます。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>同じ右旋回でも円は一致しません。見かけの上下動を手掛かりに、必要なら引き続けず、距離と位置を整えます。</p></div>
         </section>
 
         <section class="module" id="circle-fight" data-section="One-Circle / Two-Circle" aria-labelledby="circle-fight-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="circle-fight-title"><span class="module-title-number">11:</span><span class="module-title-text">One / Two Circle</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>旋回方向・位置関係・重要になりやすい性能を比較する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="circle-fight-title"><span class="module-title-number lesson-number">11:</span><span class="module-title-text lesson-title-text">One / Two Circle</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>旋回方向・位置関係・重要になりやすい性能を比較する。</p>
           </header>
           <figure class="reference-figure reference-figure-wide">
             <div class="reference-image-canvas reference-image-tall"><img src="assets/reference-usn-circle-flow.png" alt="上段は2機が一つの旋回円を形作るOne-Circle、下段は各機が別々の旋回円を形作るTwo-Circleを、赤と青の飛行経路で比較した図" loading="lazy"></div>
@@ -456,34 +464,34 @@
               </tbody>
             </table>
           </div>
-          <div class="warning-box"><span>注意</span><p>「One-Circleなら必ずこの機体が勝つ」という意味ではありません。初期位置・速度・エネルギー・操縦によって結果は変わります。</p></div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>One-Circleは半径、Two-Circleは持続旋回率が重要になりやすい——ただし、どちらも状況全体で判断します。</p></div>
+          <div class="warning-box callout callout-warning"><span>注意</span><p>「One-Circleなら必ずこの機体が勝つ」という意味ではありません。初期位置・速度・エネルギー・操縦によって結果は変わります。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>One-Circleは半径、Two-Circleは持続旋回率が重要になりやすい——ただし、どちらも状況全体で判断します。</p></div>
         </section>
 
         <section class="module" id="plane-motion" data-section="Plane of Motion" aria-labelledby="plane-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="plane-title"><span class="module-title-number">12:</span><span class="module-title-text">Plane of Motion</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>旋回円が置かれる「面」を理解し、2次元図の限界を知る。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="plane-title"><span class="module-title-number lesson-number">12:</span><span class="module-title-text lesson-title-text">Plane of Motion</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>旋回円が置かれる「面」を理解し、2次元図の限界を知る。</p>
           </header>
           <p><strong>Plane of Motion（運動面）</strong>とは、機体が描く旋回円が置かれている面です。2機の面がほぼ同じならIn-plane、一方が面を傾けて別の平面を使えばOut-of-planeです。</p>
-          <div class="comparison-cards two-up plane-comparison">
+          <div class="comparison-cards card-grid two-up plane-comparison">
             <article><span class="compare-tag">IN-PLANE</span><h3>ほぼ同じ運動面</h3><p>2機がほぼ同じ平面上で旋回する状態。上面の比較で関係を捉えやすい基本形です。</p><small>見るもの：同じ面内のRange・Angles・Closure</small></article>
             <article><span class="compare-tag warning">OUT-OF-PLANE</span><h3>異なる運動面</h3><p>一方が別の平面を使う状態。上面図だけでは高度方向のずれを表しきれません。</p><small>見るもの：上下方向を含む相対運動</small></article>
           </div>
-          <div class="bridge-note"><span>ADVANCED CONNECTION</span><p>Out-of-planeの理解は、上下方向にTurning Roomを作る応用機動へつながります。このページでは、実際の関係が3次元であることの認識までを扱います。</p></div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>実際の機動は3次元です。上面図は基礎を整理する道具であり、垂直方向を含むすべてを表すものではありません。<a class="source-marker" href="#ref-4" aria-label="参考資料4へ">[4]</a></p></div>
+          <div class="bridge-note callout callout-bridge"><span>ADVANCED CONNECTION</span><p>Out-of-planeの理解は、上下方向にTurning Roomを作る応用機動へつながります。このページでは、実際の関係が3次元であることの認識までを扱います。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>実際の機動は3次元です。上面図は基礎を整理する道具であり、垂直方向を含むすべてを表すものではありません。<a class="source-marker" href="#ref-4" aria-label="参考資料4へ">[4]</a></p></div>
         </section>
 
         <section class="module" id="guns" data-section="射撃機会の基礎" aria-labelledby="guns-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="guns-title"><span class="module-title-number">13:</span><span class="module-title-text">射撃機会の基礎</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>安定追跡と一瞬の交差という、2つの射撃機会の違いを概念として理解する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="guns-title"><span class="module-title-number lesson-number">13:</span><span class="module-title-text lesson-title-text">射撃機会の基礎</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>安定追跡と一瞬の交差という、2つの射撃機会の違いを概念として理解する。</p>
           </header>
-          <div class="safety-intro">
+          <div class="safety-intro callout callout-scope">
             <span>EDUCATIONAL SCOPE</span>
             <p>ここでは武器操作や照準手順ではなく、BFM上の位置関係だけを扱います。具体的な運用手順や機種固有の数値は扱いません。</p>
           </div>
-          <div class="guns-grid">
+          <div class="guns-grid card-grid">
             <article>
               <h3>Tracking Guns Solution <small>継続追跡の機会</small></h3>
               <p>敵機の動きに合わせて、照準位置に継続して捉えられる状態。Lead・適切なRange・相手の運動面との一致が必要です。</p>
@@ -493,13 +501,13 @@
               <p>敵機が照準位置を短時間だけ横切る瞬間を利用する機会。未来位置の予測が必要で、安定した追跡ではなく、機会はごく短時間です。</p>
             </article>
           </div>
-          <div class="checkpoint"><strong>ここまでの要点</strong><p>Trackingは安定して追い続ける機会、Snapshotは一瞬の交差機会。どちらも位置関係の結果として生まれます。</p></div>
+          <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>Trackingは安定して追い続ける機会、Snapshotは一瞬の交差機会。どちらも位置関係の結果として生まれます。</p></div>
         </section>
 
         <section class="module" id="recap" data-section="初心者が覚える要点" aria-labelledby="recap-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="recap-title"><span class="module-title-number">14:</span><span class="module-title-text">初心者の要点</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>PART 01の判断軸を短い言葉で思い出せる。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="recap-title"><span class="module-title-number lesson-number">14:</span><span class="module-title-text lesson-title-text">初心者の要点</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>PART 01の判断軸を短い言葉で思い出せる。</p>
           </header>
           <div class="recap-panel">
             <ol class="recap-list">
@@ -516,9 +524,9 @@
         </section>
 
         <section class="module" id="quiz" data-section="確認問題" aria-labelledby="quiz-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="quiz-title"><span class="module-title-number">15:</span><span class="module-title-text">12問の確認問題</span></h2></div>
-            <p class="learning-goal"><span>学習目標</span>答えを選ぶだけでなく、解説から判断の理由を確認する。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="quiz-title"><span class="module-title-number lesson-number">15:</span><span class="module-title-text lesson-title-text">12問の確認問題</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>学習目標</span>答えを選ぶだけでなく、解説から判断の理由を確認する。</p>
           </header>
           <div class="quiz-intro">
             <p>各問に回答すると、正解・正しい答え・短い解説・復習リンクが表示されます。</p>
@@ -531,13 +539,13 @@
             <p id="quiz-message"></p>
             <button class="button button-quiet" id="quiz-reset" type="button">もう一度挑戦する</button>
           </section>
-          <noscript><p class="warning-box">確認問題の自動採点にはJavaScriptが必要です。本文と各章の「ここまでの要点」はJavaScriptなしでも読めます。</p></noscript>
+          <noscript><p class="warning-box callout callout-warning">確認問題の自動採点にはJavaScriptが必要です。本文と各章の「ここまでの要点」はJavaScriptなしでも読めます。</p></noscript>
         </section>
 
         <section class="module" id="glossary" data-section="用語集" aria-labelledby="glossary-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="glossary-title"><span class="module-title-number">16:</span><span class="module-title-text">用語集</span></h2></div>
-            <p class="learning-goal"><span>使い方</span>英語・日本語・説明文から検索し、関連する学習章へ戻る。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="glossary-title"><span class="module-title-number lesson-number">16:</span><span class="module-title-text lesson-title-text">用語集</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>使い方</span>英語・日本語・説明文から検索し、関連する学習章へ戻る。</p>
           </header>
           <div class="glossary-search">
             <label for="glossary-input">用語を検索</label>
@@ -550,11 +558,11 @@
         </section>
 
         <section class="module" id="references" data-section="参考資料" aria-labelledby="references-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="references-title"><span class="module-title-number">17:</span><span class="module-title-text">参考資料・出典</span></h2></div>
-            <p class="learning-goal"><span>方針</span>動画・公開資料・提供PDFの書誌情報と外部リンクを、この章へまとめる。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="references-title"><span class="module-title-number lesson-number">17:</span><span class="module-title-text lesson-title-text">参考資料・出典</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>方針</span>動画・公開資料・提供PDFの書誌情報と外部リンクを、この章へまとめる。</p>
           </header>
-          <div class="source-notice"><strong>資料の表示方針</strong><p>本文では小さな参照番号だけを表示し、動画、書誌情報、原典、作者、権利表示、外部リンクはこの章へ集約しています。提供PDFは文章の確認と要約にだけ使い、図版は転載していません。</p></div>
+          <div class="source-notice callout callout-source"><strong>資料の表示方針</strong><p>本文では小さな参照番号だけを表示し、動画、書誌情報、原典、作者、権利表示、外部リンクはこの章へ集約しています。提供PDFは文章の確認と要約にだけ使い、図版は転載していません。</p></div>
           <ol class="references-list">
             <li id="ref-1"><span>USER-PROVIDED MANUAL</span><div><h3>Republic of Korea Air Force — Basic Employment Manual F-16C</h3><p>『Korean Air Force Tactics, Techniques &amp; Procedures 3-3, Volume 5』、2005年10月1日。§4.3（印刷ページ4-12〜4-24）の目的、継続的な判断、位置関係、追跡、旋回とエネルギーを要約。本文では機種固有の数値・操作・図版を使用していません。</p></div><time datetime="2005-10-01">発行日：2005-10-01</time></li>
             <li id="ref-2"><span>PUBLIC EDUCATION</span><div><h3>NASA Glenn Research Center — Guide to Aerodynamics</h3><p>揚力・抗力・推力・迎角・旋回などを扱う公式公開教材。本文のFour Forces図もNASA Glennが公開する教材図です。</p><a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/learn-about-aerodynamics/" target="_blank" rel="noopener noreferrer">NASA公式教材 <span aria-hidden="true">↗</span></a> <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/four-forces-on-an-airplane/" target="_blank" rel="noopener noreferrer">Four Forces図 <span aria-hidden="true">↗</span></a></div><time datetime="2026-07-31">参照日：2026-07-31</time></li>
@@ -570,9 +578,9 @@
         </section>
 
         <section class="module" id="next" data-section="Next Part" aria-labelledby="next-title">
-          <header class="module-header">
-            <div><h2 class="numbered-module-title" id="next-title"><span class="module-title-number">18:</span><span class="module-title-text">Next Part</span></h2></div>
-            <p class="learning-goal"><span>選択</span>基礎を修了したあとに、次に学ぶ講座を選ぶ。</p>
+          <header class="module-header lesson-header">
+            <div><h2 class="numbered-module-title lesson-title" id="next-title"><span class="module-title-number lesson-number">18:</span><span class="module-title-text lesson-title-text">Next Part</span></h2></div>
+            <p class="learning-goal lesson-goal"><span>選択</span>基礎を修了したあとに、次に学ぶ講座を選ぶ。</p>
           </header>
           <div class="next-panel course-selector">
             <div class="course-completion">
@@ -580,15 +588,15 @@
               <span class="badge badge-live">PART 01 修了</span>
             </div>
             <p class="lead-copy">ここから先は、同じ基礎を異なる立場から使います。どちらを選んでも、まずRange・Angles・Closure、エネルギー、追跡曲線の理解が土台になります。</p>
-            <div class="course-choice-grid" aria-label="次に学ぶ講座">
-              <article class="course-choice" id="course-offensive" aria-disabled="true">
+            <div class="course-choice-grid card-grid" aria-label="次に学ぶ講座">
+              <article class="course-choice content-card course-card" id="course-offensive" aria-disabled="true">
                 <div class="course-choice-meta"><span>COURSE 02</span><span class="badge">準備中</span></div>
                 <h3>Offensive BFM</h3>
                 <p>相手の後方から始め、Range・Angles・ClosureとLead／Pure／Lagを使い分けて、安定した位置条件へ進む考え方を学びます。</p>
                 <ul class="compact-list"><li>追跡曲線の選択</li><li>Closureの管理</li><li>有利な位置の維持</li></ul>
                 <button class="button button-primary" type="button" disabled>公開準備中</button>
               </article>
-              <article class="course-choice" id="course-defensive" aria-disabled="true">
+              <article class="course-choice content-card course-card" id="course-defensive" aria-disabled="true">
                 <div class="course-choice-meta"><span>COURSE 03</span><span class="badge">準備中</span></div>
                 <h3>Defensive BFM</h3>
                 <p>不利な位置から始め、相手の機会を成立させず、追跡・距離・エネルギーに問題を作って中立化や離脱を目指す考え方を学びます。</p>
@@ -596,7 +604,7 @@
                 <button class="button button-primary" type="button" disabled>公開準備中</button>
               </article>
             </div>
-            <p class="no-figure-note"><span>COURSE STATUS</span>2つの発展講座は準備中です。公開後は、この2枚のカードから進む講座を選べるようになります。</p>
+            <p class="no-figure-note callout callout-status"><span>COURSE STATUS</span>2つの発展講座は準備中です。公開後は、この2枚のカードから進む講座を選べるようになります。</p>
           </div>
         </section>
       </article>
@@ -617,6 +625,16 @@
     <div class="footer-bottom"><span>© 2026 BFM STARTER</span><a href="#top">PAGE TOP ↑</a></div>
   </footer>
 
-  <script src="script.js" defer></script>
+  <script src="scripts/utils/dom.js" defer></script>
+  <script src="scripts/data/glossary-data.js" defer></script>
+  <script src="scripts/data/quiz-data.js" defer></script>
+  <script src="scripts/components/menu.js" defer></script>
+  <script src="scripts/components/progress.js" defer></script>
+  <script src="scripts/components/mission-index.js" defer></script>
+  <script src="scripts/components/speed-lab.js" defer></script>
+  <script src="scripts/components/welcome-sequence.js" defer></script>
+  <script src="scripts/components/quiz.js" defer></script>
+  <script src="scripts/components/glossary.js" defer></script>
+  <script src="scripts/main.js" defer></script>
 </body>
 </html>

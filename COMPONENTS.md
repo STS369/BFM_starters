@@ -1,0 +1,99 @@
+# BFM STARTER コンポーネントガイド
+
+現在の外観と静的HTMLの読みやすさを保ちながら、再利用するUIの責務を明確にするためのガイドです。既存の機能クラスはJavaScriptや後方互換のフックとして残し、共通クラスをCSSの正式なAPIとして扱います。
+
+## CSSファイル構成
+
+CSSは役割別に9ファイルへ分け、次の順で読み込みます。順序もカスケードの一部なので変更しないでください。
+
+1. `styles/tokens.css` — 色、文字サイズ、余白などのデザイントークン
+2. `styles/base.css` — body、見出し、リンク、フォーカスなど文書の基礎
+3. `styles/layout.css` — ヘッダー、ヒーロー、ページ幅、MISSION INDEX
+4. `styles/components.css` — 共通見出し、ボタン、カード、Callout
+5. `styles/welcome.css` — Apple風スクロールウェルカム
+6. `styles/lessons.css` — 図表、比較UI、各学習トピック固有の見た目
+7. `styles/quiz.css` — 確認問題、回答状態、採点結果
+8. `styles/glossary.css` — 用語検索、用語カード
+9. `styles/responsive.css` — ブレークポイント、動き軽減、読みやすさの最終調整
+
+## LessonHeader
+
+各学習章の番号、タイトル、学習目標をまとめます。CSSでは `lesson-*` を主セレクターにします。
+
+```html
+<header class="module-header lesson-header">
+  <div>
+    <h2 class="numbered-module-title lesson-title">
+      <span class="module-title-number lesson-number">01:</span>
+      <span class="module-title-text lesson-title-text">BFMとは何か</span>
+    </h2>
+  </div>
+  <p class="learning-goal lesson-goal"><span>学習目標</span>説明文</p>
+</header>
+```
+
+## InfoStack
+
+同じ幅と間隔で縦に並ぶ補足情報です。現在は「制作背景」「サイトの目的」「お願い」に使用します。間隔は `--component-stack-gap` で変更できます。
+
+## CardGrid / ContentCard
+
+`card-grid` はカードを並べる共通の外枠です。列数やカード固有の見た目は `comparison-cards`、`principle-grid`、`triad`、`two-term-grid`、`guns-grid`、`course-choice-grid` が担当します。
+
+`content-card` の役割別バリエーションは次のとおりです。
+
+- `interactive-card` — 確認問題など操作を含むカード
+- `reference-card` — 用語集など参照用カード
+- `course-card` — 次の講座を選ぶカード
+
+## Callout
+
+`callout` を共通クラスとし、意味に応じて次のバリエーションを使います。
+
+| バリエーション | 用途 | 互換クラス |
+|---|---|---|
+| `callout-summary` | 章の要点 | `checkpoint` |
+| `callout-warning` | 注意・判断 | `warning-box` |
+| `callout-advanced` | 発展内容 | `advanced-box` |
+| `callout-bridge` | 次の概念との接続 | `bridge-note` |
+| `callout-source` | 資料方針 | `source-notice` |
+| `callout-status` | 講座の状態 | `no-figure-note` |
+| `callout-scope` | 教材の範囲 | `safety-intro` |
+
+## 固有コンポーネント
+
+`WelcomeSequence`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector` は、独立した名前と処理を維持します。
+
+`WelcomeSequence` の最初のメッセージは、スマホで不自然な位置に折り返さないよう「ようこそ」と「BFM Starterへ」を別の `span` にしています。文言を変更するときも、各行が320px幅に収まるか確認してください。
+
+## JavaScriptコンポーネント
+
+HTML本文はJavaScript無効時にも読める状態を維持するため、外部HTMLには分割しません。操作機能だけを読み込み順付きの通常スクリプトへ分けます。これにより、HTTP公開時とWindowsからの直接表示の両方で動作します。
+
+- `scripts/main.js` — 起動順を管理するエントリーポイント
+- `scripts/data/` — 確認問題と用語のデータ
+- `scripts/utils/dom.js` — DOM共通処理
+- `scripts/components/` — Menu、Progress、MissionIndex、SpeedLab、WelcomeSequence、Quiz、Glossary
+
+各ファイルは `window.BFM` 名前空間へ `setup...()` を登録し、`main.js` だけが初期化します。HTMLのスクリプト順は依存関係の一部なので変更しないでください。
+
+## レスポンシブの責務
+
+モバイル向けの上書きは原則として `styles/responsive.css` に置きます。Apple風ウェルカム固有の幅・高さ調整だけは `styles/welcome.css` に置きます。
+
+| 幅 | 主な切り替え |
+|---|---|
+| 940px以下 | モバイルメニュー、MISSION INDEXとスプリッターの非表示、本文1カラム化 |
+| 720px以下 | 比較カード・図表・学習目標の1列化、章見出しと余白の縮小 |
+| 430px以下 | クイズ操作、用語メタ情報、ボタン、フッターの縦配置 |
+| 320〜430px | 見出しの見切れ、44px以上の操作領域、ページ全体の横スクロールを重点確認 |
+
+横に長い表は `.table-wrap` の内側だけをスクロール可能にします。`body` の横幅へ表を押し出したり、文章や英単語を途中で強制改行したりしないでください。
+
+## 変更時の確認
+
+1. 共通構造は `styles/components.css`、教材固有の見た目は `styles/lessons.css`、画面幅への対応は `styles/responsive.css` へ記述します。
+2. 既存の機能クラスは削除せず、共通クラスと組み合わせます。
+3. 9つのCSSファイルの読み込み順を維持します。
+4. 1440px、768px、430px、390px、375px、360px、320pxと `prefers-reduced-motion` を確認します。
+5. `tests/smoke.mjs` で表示、操作、JavaScript無効時の状態を確認します。

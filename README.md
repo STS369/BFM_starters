@@ -1,6 +1,6 @@
 # BFM STARTER
 
-日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材ですHTML5、CSS3、Vanilla JavaScriptだけで動作し、ビルドは不要です
+日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材です。HTML5、CSS3、Vanilla JavaScriptだけで動作し、ビルドは不要です。
 
 ## 1. 設計方針
 
@@ -15,31 +15,60 @@
 
 ## 2. 情報設計と学習順序
 
-1. このサイトを作った目的
-2. BFMとは何か、何のために存在するのか
-3. 観察・予測・機動を繰り返す判断サイクルと3原則
-4. 航空機の旋回とエネルギー
-5. Turn Rate、Turn Radius、瞬間旋回と持続旋回
-6. Range、Aspect Angle、HCA、ATA、Closure
-7. Turning RoomとTurn Circle
-8. Lead、Pure、Lag Pursuit
+最上部のウェルカムと「このサイトを作った目的」に続き、MISSION INDEXと本文は次の18章で対応しています。
+
+1. BFMとは何か
+2. 基礎講座の進め方
+3. BFMの3原則
+4. 旋回とエネルギー
+5. Turn Rate / Radius
+6. 2機の位置関係
+7. Turning Room / Circle
+8. Pursuit Curves
 9. Overshoot
-10. Turn Circle Alignment
-11. One-CircleとTwo-Circle
-12. In-planeとOut-of-plane
-13. Tracking GunsとSnapshotの概念
-14. 要点と12問の確認問題
-15. 用語集と参考資料
-16. Next PartでOffensive BFMまたはDefensive BFMを選択
+10. Circle Alignment
+11. One / Two Circle
+12. Plane of Motion
+13. 射撃機会の基礎
+14. 初心者の要点
+15. 12問の確認問題
+16. 用語集
+17. 参考資料・出典
+18. Next Part
 
 ## 3. ファイル構成
 
 ```text
 DogfightLecture/
 ├── index.html          # PART 01本文、出典付き図版、SEO、参考資料、次講座の選択
-├── styles.css          # デザイントークン、レスポンシブ、動き軽減
-├── script.js           # 操作機能、クイズデータ、用語データ
+├── styles/
+│   ├── tokens.css       # 色・文字サイズ・余白
+│   ├── base.css         # body、見出し、リンク、フォーカス
+│   ├── layout.css       # ヘッダー、ページ幅、MISSION INDEX
+│   ├── components.css   # カード、見出し、ボタン、Callout
+│   ├── welcome.css      # Apple風ウェルカム
+│   ├── lessons.css      # 各学習トピック固有
+│   ├── quiz.css         # 確認問題と採点結果
+│   ├── glossary.css     # 用語検索と用語カード
+│   └── responsive.css   # 画面幅・動き軽減・読みやすさ
+├── scripts/
+│   ├── main.js                  # window.BFMに登録されたUIの起動処理
+│   ├── utils/dom.js             # DOM共通処理
+│   ├── data/
+│   │   ├── quiz-data.js         # 確認問題データ
+│   │   └── glossary-data.js     # 用語データ
+│   └── components/
+│       ├── menu.js
+│       ├── progress.js
+│       ├── mission-index.js
+│       ├── speed-lab.js
+│       ├── welcome-sequence.js
+│       ├── quiz.js
+│       └── glossary.js
+├── COMPONENTS.md       # コンポーネントの責務と利用方法
 ├── README.md           # 設計・公開・拡張・確認手順
+├── robots.txt          # 検索クローラー向け設定
+├── sitemap.xml         # 公開ページ一覧
 ├── tests/
 │   └── smoke.mjs       # 依存なしのChrome DevToolsスモークテスト
 └── assets/
@@ -50,19 +79,28 @@ DogfightLecture/
     └── reference-usn-circle-flow.png
 ```
 
-ビルド不要の静的ファイル構成です将来は `fundamentals.html`、`offensive.html`、`defensive.html`、`glossary.html`、`references.html` へ章単位で分割できます
+ビルド不要の静的ファイル構成です。CSSは上記の順、JavaScriptは `index.html` に記載された依存順で読み込みます。将来は `offensive.html`、`defensive.html` などへ講座単位で分割できます。
 
 ## 4. ローカルで確認する
 
-`index.html`を直接開いても動作しますHTTP経由でGitHub Pagesに近い形を確認する場合は、プロジェクトの1階層上から次を実行します
+Windowsのエクスプローラーから `index.html` を直接開いても動作します。HTTP経由でGitHub Pagesに近い形を確認する場合は、このプロジェクトフォルダーで次を実行します。
 
 ```powershell
-py -m http.server 4173 --directory C:\Users\yuri4\Web
+py -m http.server 4173
 ```
 
-ブラウザーで `http://127.0.0.1:4173/DogfightLecture/` を開きます
+ブラウザーで `http://127.0.0.1:4173/` を開きます。
 
-## 5. GitHub Pagesで公開する
+## 5. レスポンシブ設計
+
+- 940px以下ではMISSION INDEXとスプリッターを非表示にし、ヘッダーをモバイルメニューへ切り替えます。
+- 720px以下では比較カード、図表、学習目標を原則1列にし、本文の左右余白と見出しサイズを調整します。
+- 430px以下ではクイズ操作、用語カード、ボタン、フッターを狭幅向けに再配置します。
+- Apple風ウェルカムは縦画面と横画面で文字サイズと高さを切り替え、文が画面外へはみ出さないようにします。
+- 横に長い表だけは `.table-wrap` 内で横スクロールでき、ページ全体には横スクロールを発生させません。
+- 主要確認幅は320px、360px、375px、390px、430pxです。タッチ操作は44px以上を基準にしています。
+
+## 6. GitHub Pagesで公開する
 
 1. このフォルダーをGitHubリポジトリへコミットして、既定ブランチへpushします
 2. GitHubのリポジトリ画面で **Settings → Pages** を開きます
@@ -73,7 +111,7 @@ py -m http.server 4173 --directory C:\Users\yuri4\Web
 
 すべての内部資産は相対パスなので、`https://ユーザー名.github.io/リポジトリ名/` のサブパスでも動作します
 
-## 6. Offensive BFMを追加する
+## 7. Offensive BFMを追加する
 
 1. `index.html`を複製して `offensive.html`を作り、`main`内をPART 02の章へ差し替えます
 2. `.module`、`.module-header`、`.learning-goal`、`.checkpoint`、`.interactive-panel`を再利用します
@@ -81,16 +119,16 @@ py -m http.server 4173 --directory C:\Users\yuri4\Web
 4. High/Low Yo-Yoなどは、最初に学習目標・本文・比較UI・要点を用意します適切な公開図がある場合だけ原典と権利を確認して引用し、実機値や具体的武器操作は掲載しません
 5. 参照した一次資料を参考資料へ追加します
 
-## 7. Defensive BFMを追加する
+## 8. Defensive BFMを追加する
 
 1. 同様に `defensive.html`を作り、PART 03の共通ナビゲーションを有効にします
 2. Break Turn、Reversal、Overshoot誘発、Energy回復などを独立した`.module`へ分けます
 3. 攻撃側・防御側の色とラベルを図と本文で一貫させ、色だけで役割を伝えないようにします
 4. 新しい用語を用語集へ追加し、関連する学習章へのリンクを設定します
 
-## 8. 用語集を追加・修正する
+## 9. 用語集を追加・修正する
 
-`script.js`の`glossaryData`配列へ次の形で1件追加します
+`scripts/data/glossary-data.js`の`glossaryData`配列へ次の形で1件追加します
 
 ```js
 {
@@ -104,9 +142,9 @@ py -m http.server 4173 --directory C:\Users\yuri4\Web
 
 描画処理とは分離済みです複数ページ化するときは、この配列を`glossary.json`へ移し、`fetch`で読む構成にできますGitHub PagesではJSONファイルのパスを相対パスにしてください
 
-## 9. クイズを追加する
+## 10. クイズを追加する
 
-`script.js`の`quizData`へ次の形で追加します
+`scripts/data/quiz-data.js`の`quizData`へ次の形で追加します
 
 ```js
 {
@@ -121,7 +159,7 @@ py -m http.server 4173 --directory C:\Users\yuri4\Web
 
 `answer`は0から始まる選択肢番号です問題数を変更した場合、得点メッセージの境界も`showQuizResult()`で見直してください
 
-## 10. 参考資料を追加する
+## 11. 参考資料を追加する
 
 - `#references`の`references-list`へ、資料種別、正式名、説明、公式URL、参照日を追加します
 - YouTubeは動画タイトル・チャンネル・動画URLを公開元で確認します
@@ -129,14 +167,16 @@ py -m http.server 4173 --directory C:\Users\yuri4\Web
 - 確認できない情報はURLを推測せず「要確認」と表示します
 - 本文の重要説明から`#ref-N`への脚注リンクを付けます
 
-## 11. 動作確認チェックリスト
+## 12. 動作確認チェックリスト
 
-- [ ] `node --check script.js`が成功する
+- [ ] `Get-ChildItem scripts -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }`が成功する
 - [ ] ブラウザーのConsoleにエラーがない
 - [ ] 最上部にサイトの制作目的が表示され、上部ナビゲーションが3系統になっている
 - [ ] 各章は番号がタイトルの上に少し大きく表示され、タイトルが1行に収まる
 - [ ] MISSION INDEXの縦スプリッターをドラッグまたは矢印キーで動かせる
-- [ ] 320px、375px、768px、1280px、1440pxで横スクロールがない
+- [ ] 320px、360px、375px、390px、430px、768px、1280px、1440pxでページ全体の横スクロールがない
+- [ ] スマホ幅でApple風ウェルカム、章見出し、カード、表、クイズ、用語検索、Next Partが画面内に収まる
+- [ ] モバイルの主要ボタンと選択肢が44px以上の操作領域を持つ
 - [ ] Low / Rate Band / Highの3ボタンで説明・利点・注意点が変わる
 - [ ] Aspect Angleの0°、90°、180°を比較表で確認できる
 - [ ] Closureの接近・一定・離隔を比較表で確認できる

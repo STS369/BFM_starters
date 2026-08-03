@@ -1,0 +1,92 @@
+<section class="mission-sequence" id="energy" data-section="旋回とエネルギー" aria-labelledby="energy-title">
+  <div class="mission-reveal" data-mission-reveal aria-hidden="true">
+    <div class="mission-reveal-sticky">
+      <div class="mission-reveal-grid"></div>
+      <div class="mission-reveal-copy">
+        <p class="mission-reveal-label">MISSION <span>04</span></p>
+        <p class="mission-reveal-title">旋回とエネルギー</p>
+      </div>
+      <p class="mission-reveal-cue"><span></span>SCROLL TO CONTINUE</p>
+    </div>
+  </div>
+  <section class="module" data-mission-content aria-labelledby="energy-title">
+    <header class="module-header lesson-header">
+      <div><h2 class="numbered-module-title lesson-title" id="energy-title"><span class="module-title-number lesson-number">04:</span><span class="module-title-text lesson-title-text">旋回とエネルギー</span></h2></div>
+      <p class="learning-goal lesson-goal"><span>学習目標</span>操縦入力・迎角・揚力・抗力・速度のつながりを説明できる。</p>
+    </header>
+    <div class="force-layout">
+      <div>
+        <p class="lead-copy">航空機のエネルギー状態（energy state）は、主に<strong>速度と高度</strong>として考えます。操縦桿を引くと迎角が増え、旋回に必要な揚力を得ますが、同時に抗力も増えます。<a class="source-marker" href="#ref-2" aria-label="参考資料2へ">[2]</a></p>
+        <div class="term-chips" aria-label="基本用語">
+          <span><b>lift</b> 揚力</span><span><b>drag</b> 抗力</span><span><b>thrust</b> 推力</span>
+          <span><b>angle of attack</b> 迎角</span><span><b>G-force</b> G</span><span><b>load factor</b> 荷重倍数</span>
+          <span><b>stall</b> 失速</span><span><b>airspeed</b> 対気速度</span>
+        </div>
+      </div>
+      <figure class="reference-figure">
+        <div class="reference-image-canvas">
+          <img src="assets/reference-nasa-four-forces.jpg" alt="航空機に働く揚力、重量、推力、抗力を矢印で示したNASA Glennの図" loading="lazy">
+        </div>
+        <figcaption class="compact-citation"><a class="source-marker" href="#ref-2" aria-label="参考資料2へ">[2]</a></figcaption>
+      </figure>
+    </div>
+    <dl class="force-definitions">
+      <div><dt>lift <small>揚力</small></dt><dd>空気の流れから生まれ、機体を支えたり旋回させたりする力。</dd></div>
+      <div><dt>drag <small>抗力</small></dt><dd>空気が機体の進行を妨げる力。強い旋回で増えやすい。</dd></div>
+      <div><dt>thrust <small>推力</small></dt><dd>エンジンなどが機体を前へ進める方向に作る力。</dd></div>
+      <div><dt>angle of attack <small>迎角</small></dt><dd>翼の基準線と、翼に当たる空気の流れとの角度。</dd></div>
+      <div><dt>G-force / load factor <small>G・荷重倍数</small></dt><dd>旋回などで機体へかかる荷重を、重力との比で捉える量。</dd></div>
+      <div><dt>stall <small>失速</small></dt><dd>臨界迎角を超えるなどして気流が剥離し、必要な揚力を保てない状態。</dd></div>
+      <div><dt>airspeed <small>対気速度</small></dt><dd>周囲の空気に対する速度。旋回性能を考える基礎となる。</dd></div>
+      <div><dt>energy state <small>エネルギー状態</small></dt><dd>主に速度と高度の組み合わせとして捉える、機動に使える状態。</dd></div>
+      <div><dt>energy management <small>エネルギー管理</small></dt><dd>速度と高度を、位置取りのために使う・温存する・回復する判断。</dd></div>
+    </dl>
+    <ol class="cause-chain" aria-label="操縦桿を引いたときの変化">
+      <li>操縦桿を引く</li><li>迎角が増える</li><li>揚力が増える</li><li>旋回が強くなる</li><li>抗力も増える</li><li>速度を失いやすい</li>
+    </ol>
+    <p class="small-note">迎角を増やしすぎると翼上面の気流が剥離し、揚力を保てない<strong>stall（失速）</strong>へ近づきます。強く引くほど常に良い、という関係ではありません。</p>
+
+    <div class="limits-grid">
+      <article>
+        <span class="limit-mark low">LOW SPEED</span>
+        <h3>Lift Limit <small>揚力限界</small></h3>
+        <p>低速域で、現在の状態から生み出せる揚力の上限に近い状態。瞬間的な旋回率を得られますが、抗力が大きく、速度を急速に失います。</p>
+        <p class="analogy">airspeedをturn rateへ交換するイメージ</p>
+      </article>
+      <article>
+        <span class="limit-mark rate">SUSTAINED</span>
+        <h3>Rate Band <small>持続しやすい速度帯</small></h3>
+        <p>高い旋回率を比較的少ない損失で維持しやすい帯域。機体・搭載物・重量・高度で変わるため、固定値として暗記しません。</p>
+        <p class="analogy">速さと旋回を長く両立しやすい領域</p>
+      </article>
+      <article>
+        <span class="limit-mark high">HIGH SPEED</span>
+        <h3>Load Limit <small>荷重限界</small></h3>
+        <p>高速域などで許容最大Gに達した状態。さらに引いても旋回率が大きく伸びず、速度のため旋回半径は大きい場合があります。</p>
+        <p class="analogy">高速＝小さく旋回、ではない</p>
+      </article>
+    </div>
+
+    <div class="interactive-panel" id="speed-lab">
+      <div class="panel-heading">
+        <div><p class="interactive-label">COMPARE 01</p><h3>速度域ごとの注意点</h3></div>
+        <p>数値を推定せず、3つの定性的な領域だけを比較します。</p>
+      </div>
+      <div class="speed-choice" role="group" aria-label="速度域を選択">
+        <button type="button" data-speed-region="low" aria-pressed="false"><span>LOW</span><small>Lift Limit</small></button>
+        <button type="button" class="is-active" data-speed-region="rate" aria-pressed="true"><span>RATE BAND</span><small>Best Sustained Area</small></button>
+        <button type="button" data-speed-region="high" aria-pressed="false"><span>HIGH</span><small>Load Limit</small></button>
+      </div>
+      <div class="region-readout region-readout-wide" id="speed-region" aria-live="polite">
+        <span class="readout-kicker">SELECTED REGION</span>
+        <strong id="speed-region-name">Best Sustained Area</strong>
+        <p id="speed-region-desc">高い旋回率を比較的維持しやすい領域です。正確な速度帯は機体・重量・高度・搭載物で変わります。</p>
+        <dl class="region-facts">
+          <div><dt>主な利点</dt><dd id="speed-benefit">旋回率とエネルギー維持の両立</dd></div>
+          <div><dt>主な注意</dt><dd id="speed-caution">固定の速度値として暗記しない</dd></div>
+        </dl>
+      </div>
+    </div>
+    <div class="checkpoint callout callout-summary"><strong>ここまでの要点</strong><p>強い旋回は無料ではありません。低速では失速、高速では大きな半径、中間では持続性——速度域ごとの交換条件を意識します。</p></div>
+  </section>
+</section>

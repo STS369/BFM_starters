@@ -23,6 +23,7 @@
 
     button.addEventListener("click", () => {
       const shouldOpen = button.getAttribute("aria-expanded") !== "true";
+      if (shouldOpen) document.querySelector("#mission-index-menu")?.removeAttribute("open");
       button.setAttribute("aria-expanded", String(shouldOpen));
       button.setAttribute("aria-label", shouldOpen ? "メニューを閉じる" : "メニューを開く");
       nav.classList.toggle("is-open", shouldOpen);

@@ -11,7 +11,7 @@
   border-bottom: 1px solid var(--line-soft);
   background:
     radial-gradient(circle at 50% 45%, rgba(89, 214, 232, 0.1), transparent 32%),
-    var(--bg);
+    var(--bg, transparent);
   isolation: isolate;
 }
 
@@ -195,6 +195,214 @@ html:not(.js-enabled) .welcome-message {
   }
 
   .welcome-scroll-cue {
+    display: none;
+  }
+}
+
+/* Mission introductions inside the single-page lesson flow */
+.mission-sequence {
+  position: relative;
+  min-width: 0;
+}
+
+.mission-reveal {
+  --mission-opacity: 0;
+  --mission-translate: 28px;
+  --mission-scale: 0.975;
+  position: relative;
+  width: min(94vw, 1280px);
+  min-height: 140svh;
+  margin-left: 50%;
+  overflow: clip;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(89, 214, 232, 0.1), transparent 32%),
+    var(--bg, transparent);
+  isolation: isolate;
+  transform: translateX(-50%);
+}
+
+.mission-reveal-sticky {
+  position: sticky;
+  top: var(--header-height);
+  display: grid;
+  height: calc(100svh - var(--header-height));
+  min-height: 420px;
+  place-items: center;
+  overflow: hidden;
+}
+
+.mission-reveal-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, transparent 49.9%, rgba(89, 214, 232, 0.055) 50%, transparent 50.1%),
+    linear-gradient(transparent 49.9%, rgba(89, 214, 232, 0.055) 50%, transparent 50.1%);
+  background-position: center;
+  background-size: min(12vw, 150px) min(12vw, 150px);
+  mask-image: radial-gradient(circle at center, #000, transparent 72%);
+  opacity: 0.8;
+}
+
+.mission-reveal-copy {
+  display: grid;
+  width: min(100%, 920px);
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+  padding: clamp(1.25rem, 4vw, 3rem);
+  place-items: center;
+  text-align: center;
+  will-change: opacity, transform;
+}
+
+.js-enabled .mission-reveal-copy {
+  opacity: var(--mission-opacity);
+  transform: translateY(var(--mission-translate)) scale(var(--mission-scale));
+}
+
+.mission-reveal-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65em;
+  margin: 0;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: clamp(0.7rem, 1.1vw, 0.88rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mission-reveal-label span {
+  color: var(--text);
+  font-size: 1.55em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mission-reveal-title {
+  max-width: 14ch;
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(2.5rem, 5.7vw, 5.8rem);
+  font-weight: 780;
+  hyphens: none;
+  letter-spacing: -0.055em;
+  line-height: 1.08;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.mission-reveal-cue {
+  position: absolute;
+  bottom: clamp(1.1rem, 3vh, 2rem);
+  left: 50%;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  place-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.mission-reveal-cue span {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(var(--cyan), transparent);
+}
+
+.mission-sequence:first-child > .module {
+  padding-top: 0;
+  border-top: 0;
+}
+
+html:not(.js-enabled) .mission-reveal {
+  min-height: auto;
+}
+
+html:not(.js-enabled) .mission-reveal-sticky {
+  position: relative;
+  top: auto;
+  height: auto;
+  min-height: 0;
+  padding-block: clamp(4rem, 12vw, 7rem);
+}
+
+html:not(.js-enabled) .mission-reveal-copy {
+  opacity: 1;
+  transform: none;
+}
+
+html:not(.js-enabled) .mission-reveal-cue {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .mission-reveal {
+    min-height: 130svh;
+  }
+
+  .mission-reveal-sticky {
+    min-height: 360px;
+  }
+
+  .mission-reveal-copy {
+    padding-inline: clamp(0.75rem, 4vw, 1.25rem);
+  }
+
+  .mission-reveal-title {
+    max-width: min(100%, 13ch);
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    letter-spacing: -0.045em;
+  }
+}
+
+@media (max-width: 940px) and (orientation: landscape) and (max-height: 600px) {
+  .mission-reveal {
+    min-height: 135svh;
+  }
+
+  .mission-reveal-sticky {
+    min-height: 0;
+  }
+
+  .mission-reveal-copy {
+    gap: 0.65rem;
+  }
+
+  .mission-reveal-title {
+    max-width: 22ch;
+    font-size: clamp(1.9rem, 6vw, 3rem);
+  }
+
+  .mission-reveal-cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-reveal {
+    min-height: auto;
+  }
+
+  .mission-reveal-sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    padding-block: clamp(4rem, 12vw, 7rem);
+  }
+
+  .mission-reveal-copy {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .mission-reveal-cue {
     display: none;
   }
 }

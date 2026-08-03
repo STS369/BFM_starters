@@ -7,15 +7,25 @@
   "use strict";
 
   window.BFM = window.BFM || {};
-  const { setupMenu, setupProgressAndScrollSpy, setupSpeedLab, setupIndexResizer, setupQuiz, setupGlossary, setupWelcomeSequence } = window.BFM;
+  const {
+    setupMenu,
+    setupProgressAndScrollSpy,
+    setupSpeedLab,
+    setupMissionIndex,
+    setupQuiz,
+    setupGlossary,
+    setupWelcomeSequence,
+    setupMissionReveals
+  } = window.BFM;
 
   document.documentElement.classList.add("js-enabled");
 
   function initialize() {
     setupMenu();
     setupWelcomeSequence();
+    setupMissionReveals();
     setupProgressAndScrollSpy();
-    setupIndexResizer();
+    setupMissionIndex();
     setupSpeedLab();
     setupQuiz();
     setupGlossary();

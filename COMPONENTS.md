@@ -8,7 +8,7 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 1. `styles/tokens.css` — 色、文字サイズ、余白などのデザイントークン
 2. `styles/base.css` — body、見出し、リンク、フォーカスなど文書の基礎
-3. `styles/layout.css` — ヘッダー、ヒーロー、ページ幅、MISSION INDEX
+3. `styles/layout.css` — ヘッダー、ヒーロー、ページ幅、右上のMISSION INDEX
 4. `styles/components.css` — 共通見出し、ボタン、カード、Callout
 5. `styles/welcome.css` — Apple風スクロールウェルカム
 6. `styles/lessons.css` — 図表、比較UI、各学習トピック固有の見た目
@@ -62,28 +62,49 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 ## 固有コンポーネント
 
-`WelcomeSequence`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector` は、独立した名前と処理を維持します。
+`WelcomeSequence`、`MissionReveal`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector` は、独立した名前と処理を維持します。
 
 `WelcomeSequence` の最初のメッセージは、スマホで不自然な位置に折り返さないよう「ようこそ」と「BFM Starterへ」を別の `span` にしています。文言を変更するときも、各行が320px幅に収まるか確認してください。
 
+`MissionReveal` は各 `mission-sequence` の先頭に置きます。MISSION INDEXのリンク先IDと `data-section` は外側の `mission-sequence` が持ち、導入画面の直後に実際の `.module` を置きます。導入タイトルと章タイトルは同じ文言にしてください。
+
+`MissionIndex` は、旧「PART 01 ACTIVE」と同じヘッダー右端に単独の「目次」として配置したネイティブな `details` です。開くと18章の名前とページ進捗を表示し、項目選択で対応する `mission-sequence` へ移動します。左固定カラムとスプリッターは使用しません。JavaScriptは現在項目の強調、選択後・外側クリック・Escapeでの閉じる動作を補助します。
+
+## HTMLコンポーネントと生成
+
+公開ページは単一の `index.html` ですが、編集用ソースは次の単位へ分割しています。
+
+- `src/index.template.html` — ページ外枠と読み込み順
+- `src/partials/` — Header、WelcomeSequence、Hero、MissionIndex、Footer
+- `src/missions/` — MISSION 01〜18の導入画面と本文
+
+テンプレートの `<!-- @include missions/01-overview.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。実行時のHTML取得は行わず、公開用 `index.html` にすべての本文を含めます。
+
+```powershell
+node tools/build-html.mjs
+node tools/build-html.mjs --check
+```
+
+`index.html` は生成物なので直接編集しません。変更は `src/` へ行い、生成済みファイルもコミットします。
+
 ## JavaScriptコンポーネント
 
-HTML本文はJavaScript無効時にも読める状態を維持するため、外部HTMLには分割しません。操作機能だけを読み込み順付きの通常スクリプトへ分けます。これにより、HTTP公開時とWindowsからの直接表示の両方で動作します。
+HTML本文は編集時だけファイルを分割し、公開前に1枚へ結合します。JavaScript無効時にも本文を読め、HTTP公開時とWindowsからの直接表示の両方で動作します。操作機能は読み込み順付きの通常スクリプトへ分けます。
 
 - `scripts/main.js` — 起動順を管理するエントリーポイント
 - `scripts/data/` — 確認問題と用語のデータ
 - `scripts/utils/dom.js` — DOM共通処理
-- `scripts/components/` — Menu、Progress、MissionIndex、SpeedLab、WelcomeSequence、Quiz、Glossary
+- `scripts/components/` — Menu、Progress、MissionIndex、SpeedLab、WelcomeSequence、MissionReveal、Quiz、Glossary
 
 各ファイルは `window.BFM` 名前空間へ `setup...()` を登録し、`main.js` だけが初期化します。HTMLのスクリプト順は依存関係の一部なので変更しないでください。
 
 ## レスポンシブの責務
 
-モバイル向けの上書きは原則として `styles/responsive.css` に置きます。Apple風ウェルカム固有の幅・高さ調整だけは `styles/welcome.css` に置きます。
+モバイル向けの上書きは原則として `styles/responsive.css` に置きます。Apple風ウェルカムとMISSION導入画面に固有の幅・高さ調整だけは `styles/welcome.css` に置きます。
 
 | 幅 | 主な切り替え |
 |---|---|
-| 940px以下 | モバイルメニュー、MISSION INDEXとスプリッターの非表示、本文1カラム化 |
+| 940px以下 | モバイルメニューへの切り替え、右上目次の維持、本文1カラム化 |
 | 720px以下 | 比較カード・図表・学習目標の1列化、章見出しと余白の縮小 |
 | 430px以下 | クイズ操作、用語メタ情報、ボタン、フッターの縦配置 |
 | 320〜430px | 見出しの見切れ、44px以上の操作領域、ページ全体の横スクロールを重点確認 |
@@ -97,3 +118,4 @@ HTML本文はJavaScript無効時にも読める状態を維持するため、外
 3. 9つのCSSファイルの読み込み順を維持します。
 4. 1440px、768px、430px、390px、375px、360px、320pxと `prefers-reduced-motion` を確認します。
 5. `tests/smoke.mjs` で表示、操作、JavaScript無効時の状態を確認します。
+6. `node tools/build-html.mjs --check` で公開用HTMLが最新か確認します。

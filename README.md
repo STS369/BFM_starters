@@ -1,6 +1,6 @@
 # BFM STARTER
 
-日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材です。HTML5、CSS3、Vanilla JavaScriptだけで動作し、ビルドは不要です。
+日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材です。公開時はHTML5、CSS3、Vanilla JavaScriptだけで動作します。編集用HTMLは章ごとに分割し、依存ライブラリのないNode.jsスクリプトで1枚の `index.html` へまとめます。
 
 ## 1. 設計方針
 
@@ -9,13 +9,15 @@
 - 図版はNASA公式教材と、米海軍航空訓練資料を原典とするPublic Domain図だけを使用しています本文では小さな参照番号だけを示し、動画・書誌・原典・作者・権利表示・外部リンクは第17章へ集約しています
 - 適切な公開図を確認できない箇所では図を新作せず、比較カード・定義・操作結果のUIで説明します
 - 最上部でサイトの制作目的を伝え、上部ナビゲーションから「BFM入門」「Offensive BFM」「Defensive BFM」の3系統へ移動できます
+- 左側へ固定目次を置かず、右上の「目次」から18章を開きます。項目を選ぶと対応するMISSION導入へ移動します
+- MISSION INDEXの各章へ入る前に、章番号とタイトルをスクロール連動で表示します。動きを減らす設定やJavaScript無効時は、短い静的見出しとして表示します
 - PART 01を完成範囲とし、確認問題を終えたあとにPART 02と03を選ぶ修了導線にしています
 - 不明瞭になりやすい定義は、ユーザー提供の『Basic Employment Manual F-16C』第4章を照合し、図版や長文を転載せず初心者向けに要約しています
 - セクションID、共通カード、共通ナビゲーションを再利用し、将来の複数ページ化に備えています
 
 ## 2. 情報設計と学習順序
 
-最上部のウェルカムと「このサイトを作った目的」に続き、MISSION INDEXと本文は次の18章で対応しています。
+最上部のウェルカムと「このサイトを作った目的」に続き、右上のMISSION INDEXと本文は次の18章で対応しています。
 
 1. BFMとは何か
 2. 基礎講座の進め方
@@ -40,7 +42,13 @@
 
 ```text
 DogfightLecture/
-├── index.html          # PART 01本文、出典付き図版、SEO、参考資料、次講座の選択
+├── index.html          # 公開用の生成済み単一ページ（直接編集しない）
+├── src/
+│   ├── index.template.html  # head、ページ外枠、CSS・JSの読み込み順
+│   ├── partials/            # ヘッダー、ウェルカム、ヒーロー、目次、フッター
+│   └── missions/            # 01〜18の章本文と章導入画面
+├── tools/
+│   └── build-html.mjs       # src/からindex.htmlを生成・照合
 ├── styles/
 │   ├── tokens.css       # 色・文字サイズ・余白
 │   ├── base.css         # body、見出し、リンク、フォーカス
@@ -63,6 +71,7 @@ DogfightLecture/
 │       ├── mission-index.js
 │       ├── speed-lab.js
 │       ├── welcome-sequence.js
+│       ├── mission-reveal.js
 │       ├── quiz.js
 │       └── glossary.js
 ├── COMPONENTS.md       # コンポーネントの責務と利用方法
@@ -79,11 +88,18 @@ DogfightLecture/
     └── reference-usn-circle-flow.png
 ```
 
-ビルド不要の静的ファイル構成です。CSSは上記の順、JavaScriptは `index.html` に記載された依存順で読み込みます。将来は `offensive.html`、`defensive.html` などへ講座単位で分割できます。
+公開されるのは従来どおり1枚の静的ページです。編集後だけ `node tools/build-html.mjs` を実行し、生成済み `index.html` も一緒にコミットします。実行時の `fetch()` や外部テンプレート読み込みは使わないため、Windowsからの直接表示とGitHub Pagesの両方で動作します。CSSとJavaScriptは `src/index.template.html` に記載された順で読み込みます。
 
 ## 4. ローカルで確認する
 
-Windowsのエクスプローラーから `index.html` を直接開いても動作します。HTTP経由でGitHub Pagesに近い形を確認する場合は、このプロジェクトフォルダーで次を実行します。
+文章や構造を変更するときは `src/partials/` または `src/missions/` を編集し、プロジェクトフォルダーで次を実行します。
+
+```powershell
+node tools/build-html.mjs
+node tools/build-html.mjs --check
+```
+
+1つ目は公開用 `index.html` を生成し、2つ目は生成し忘れがないかだけを確認します。生成後の `index.html` はWindowsのエクスプローラーから直接開いても動作します。HTTP経由でGitHub Pagesに近い形を確認する場合は、続けて次を実行します。
 
 ```powershell
 py -m http.server 4173
@@ -93,7 +109,7 @@ py -m http.server 4173
 
 ## 5. レスポンシブ設計
 
-- 940px以下ではMISSION INDEXとスプリッターを非表示にし、ヘッダーをモバイルメニューへ切り替えます。
+- 940px以下ではグローバルナビゲーションをモバイルメニューへ切り替えます。右上の学習目次はすべての画面幅で使用できます。
 - 720px以下では比較カード、図表、学習目標を原則1列にし、本文の左右余白と見出しサイズを調整します。
 - 430px以下ではクイズ操作、用語カード、ボタン、フッターを狭幅向けに再配置します。
 - Apple風ウェルカムは縦画面と横画面で文字サイズと高さを切り替え、文が画面外へはみ出さないようにします。
@@ -102,18 +118,19 @@ py -m http.server 4173
 
 ## 6. GitHub Pagesで公開する
 
-1. このフォルダーをGitHubリポジトリへコミットして、既定ブランチへpushします
-2. GitHubのリポジトリ画面で **Settings → Pages** を開きます
-3. **Build and deployment** のSourceを **Deploy from a branch** にします
-4. Branchに既定ブランチ、Folderに `/(root)` を選び、Saveします
-5. 表示された公開URLでCSS、JavaScript、ページ内リンクを再確認します
-6. 公開URLが決まったら、`index.html`のコメント位置に `canonical` と `og:url` を追加します`og:image`も必要に応じて絶対URLへ変更します
+1. `node tools/build-html.mjs --check` が成功することを確認します
+2. `src/` と生成済み `index.html` を含む変更をGitHubリポジトリへコミットして、既定ブランチへpushします
+3. GitHubのリポジトリ画面で **Settings → Pages** を開きます
+4. **Build and deployment** のSourceを **Deploy from a branch** にします
+5. Branchに既定ブランチ、Folderに `/(root)` を選び、Saveします
+6. 表示された公開URLでCSS、JavaScript、ページ内リンクを再確認します
+7. 公開URLが決まったら、`src/index.template.html` のコメント位置に `canonical` と `og:url` を追加して再生成します。`og:image`も必要に応じて絶対URLへ変更します
 
 すべての内部資産は相対パスなので、`https://ユーザー名.github.io/リポジトリ名/` のサブパスでも動作します
 
 ## 7. Offensive BFMを追加する
 
-1. `index.html`を複製して `offensive.html`を作り、`main`内をPART 02の章へ差し替えます
+1. 単一ページを維持する場合は、`src/missions/18-next.html` の講座カードから続く新しい章ファイルを `src/missions/` へ追加します
 2. `.module`、`.module-header`、`.learning-goal`、`.checkpoint`、`.interactive-panel`を再利用します
 3. ナビゲーションのPART 02を通常リンクに変更し、`aria-disabled`と準備中表示を外します
 4. High/Low Yo-Yoなどは、最初に学習目標・本文・比較UI・要点を用意します適切な公開図がある場合だけ原典と権利を確認して引用し、実機値や具体的武器操作は掲載しません
@@ -121,7 +138,7 @@ py -m http.server 4173
 
 ## 8. Defensive BFMを追加する
 
-1. 同様に `defensive.html`を作り、PART 03の共通ナビゲーションを有効にします
+1. 同様に `src/missions/` へPART 03の章を追加し、共通ナビゲーションを有効にします
 2. Break Turn、Reversal、Overshoot誘発、Energy回復などを独立した`.module`へ分けます
 3. 攻撃側・防御側の色とラベルを図と本文で一貫させ、色だけで役割を伝えないようにします
 4. 新しい用語を用語集へ追加し、関連する学習章へのリンクを設定します
@@ -161,7 +178,7 @@ py -m http.server 4173
 
 ## 11. 参考資料を追加する
 
-- `#references`の`references-list`へ、資料種別、正式名、説明、公式URL、参照日を追加します
+- `src/missions/17-references.html` の `references-list` へ、資料種別、正式名、説明、公式URL、参照日を追加します
 - YouTubeは動画タイトル・チャンネル・動画URLを公開元で確認します
 - 書籍は著者、発行元、年、ISBNを出版社または信頼できる書誌で確認します
 - 確認できない情報はURLを推測せず「要確認」と表示します
@@ -170,12 +187,14 @@ py -m http.server 4173
 ## 12. 動作確認チェックリスト
 
 - [ ] `Get-ChildItem scripts -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }`が成功する
+- [ ] `node tools/build-html.mjs --check` が成功する
 - [ ] ブラウザーのConsoleにエラーがない
 - [ ] 最上部にサイトの制作目的が表示され、上部ナビゲーションが3系統になっている
 - [ ] 各章は番号がタイトルの上に少し大きく表示され、タイトルが1行に収まる
-- [ ] MISSION INDEXの縦スプリッターをドラッグまたは矢印キーで動かせる
+- [ ] 左固定目次とスプリッターがなく、右上の「目次」で18章を開閉できる
 - [ ] 320px、360px、375px、390px、430px、768px、1280px、1440pxでページ全体の横スクロールがない
 - [ ] スマホ幅でApple風ウェルカム、章見出し、カード、表、クイズ、用語検索、Next Partが画面内に収まる
+- [ ] MISSION 01〜18の導入がスクロールで表示され、目次リンクが対応する導入へ移動する
 - [ ] モバイルの主要ボタンと選択肢が44px以上の操作領域を持つ
 - [ ] Low / Rate Band / Highの3ボタンで説明・利点・注意点が変わる
 - [ ] Aspect Angleの0°、90°、180°を比較表で確認できる

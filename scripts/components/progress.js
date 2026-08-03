@@ -10,6 +10,7 @@
   const { $, $$ } = window.BFM;
 
   let refreshPageProgress = () => {};
+  let selectMission = () => {};
 
   function setupProgressAndScrollSpy() {
     const bar = $("#reading-progress-bar");
@@ -17,7 +18,7 @@
     const progressContainer = $(".index-progress");
     const progressVisual = $(".reading-progress");
     const sections = $$("[data-section]");
-    const indexLinks = $$(".section-index a");
+    const indexLinks = $$(".mission-index-list a");
     const globalLinks = $$(".global-nav a");
 
     const updateProgress = () => {
@@ -46,7 +47,17 @@
 
     if (!("IntersectionObserver" in window)) return;
 
-    const setActive = (id) => {
+    let lockedMission = "";
+    let lockExpiresAt = 0;
+    const setActive = (id, lockSelection = false) => {
+      if (!lockSelection && lockedMission && performance.now() < lockExpiresAt && id !== lockedMission) return;
+      if (lockSelection) {
+        lockedMission = id;
+        lockExpiresAt = performance.now() + 1200;
+      } else if (performance.now() >= lockExpiresAt) {
+        lockedMission = "";
+      }
+      const activeIndex = indexLinks.findIndex((link) => link.getAttribute("href") === `#${id}`);
       [...indexLinks, ...globalLinks].forEach((link) => {
         const matches = link.getAttribute("href") === `#${id}`;
         link.classList.toggle("is-active", matches);
@@ -54,6 +65,7 @@
         else link.removeAttribute("aria-current");
       });
     };
+    selectMission = (id) => setActive(id, true);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -70,4 +82,5 @@
 
   window.BFM.setupProgressAndScrollSpy = setupProgressAndScrollSpy;
   window.BFM.refreshPageProgress = (...args) => refreshPageProgress(...args);
+  window.BFM.selectMission = (...args) => selectMission(...args);
 })();

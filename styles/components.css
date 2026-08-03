@@ -16,6 +16,9 @@
   font-weight: 750;
   text-decoration: none;
   cursor: pointer;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  white-space: nowrap;
 }
 
 .button-primary {

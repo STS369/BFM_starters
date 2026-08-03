@@ -57,20 +57,20 @@
       section: "Overshoot"
     },
     {
-      question: "Two-Circle Fightで一般に重要になりやすい性能は？",
+      question: "Two‑Circle Fightで一般に重要になりやすい性能は？",
       options: ["小さいTurn Radiusだけ", "高い持続Turn Rate", "最大直線速度だけ", "最小高度"],
       answer: 1,
-      explanation: "Two-Circleではそれぞれの旋回円を進み、先に機首を向ける持続旋回率が重要になりやすいです。ただし、初期位置やエネルギーなどでも結果は変わります。",
+      explanation: "Two‑Circleではそれぞれの旋回円を進み、先に機首を向ける持続旋回率が重要になりやすいです。ただし、初期位置やエネルギーなどでも結果は変わります。",
       href: "#circle-fight",
-      section: "Two-Circle Fight"
+      section: "Two‑Circle Fight"
     },
     {
-      question: "One-Circle Fightで一般に重要になりやすい性能は？",
+      question: "One‑Circle Fightで一般に重要になりやすい性能は？",
       options: ["小さいTurn Radius", "最大航続距離", "機体の塗装", "高いClosure"],
       answer: 0,
-      explanation: "One-Circleは1つの旋回空間を作り、一般に小さい旋回半径が機首を先に向ける助けになります。だからRadius Fightとも呼ばれます。",
+      explanation: "One‑Circleは1つの旋回空間を作り、一般に小さい旋回半径が機首を先に向ける助けになります。だからRadius Fightとも呼ばれます。",
       href: "#circle-fight",
-      section: "One-Circle Fight"
+      section: "One‑Circle Fight"
     },
     {
       question: "Misaligned Turn Circlesとは、どのような状態ですか？",
@@ -81,7 +81,7 @@
       section: "Turn Circle Alignment"
     },
     {
-      question: "Out-of-plane Maneuveringが利用するものは？",
+      question: "Out‑of‑plane Maneuveringが利用するものは？",
       options: ["同じ平面だけ", "垂直方向を含む異なる旋回面", "地図上の直線だけ", "通信だけ"],
       answer: 1,
       explanation: "一方の機体が旋回面を傾け、相手と異なる面で機動します。垂直方向の空間を使い、速度・距離・Closure・旋回半径の調整につなげます。",

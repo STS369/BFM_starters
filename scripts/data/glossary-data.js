@@ -268,14 +268,14 @@
       href: "#alignment"
     },
     {
-      term: "One-Circle Fight",
+      term: "One‑Circle Fight",
       ja: "ワン・サークル戦",
       desc: "2機が1つの旋回空間を作る流れ。一般に旋回半径が重要になりやすい。",
       related: "Radius Fight / turn radius",
       href: "#circle-fight"
     },
     {
-      term: "Two-Circle Fight",
+      term: "Two‑Circle Fight",
       ja: "ツー・サークル戦",
       desc: "2機がそれぞれ別の旋回円を作る流れ。一般に持続旋回率が重要になりやすい。",
       related: "Rate Fight / turn rate",
@@ -284,33 +284,33 @@
     {
       term: "Radius Fight",
       ja: "旋回半径を重視する戦い",
-      desc: "One-Circle Fightの別名。一般に小さいTurn Radiusが有利になりやすい流れ。",
-      related: "One-Circle / turn radius",
+      desc: "One‑Circle Fightの別名。一般に小さいTurn Radiusが有利になりやすい流れ。",
+      related: "One‑Circle / turn radius",
       href: "#circle-fight"
     },
     {
       term: "Rate Fight",
       ja: "旋回率を重視する戦い",
-      desc: "Two-Circle Fightの別名。一般に高い持続Turn Rateが有利になりやすい流れ。",
-      related: "Two-Circle / turn rate",
+      desc: "Two‑Circle Fightの別名。一般に高い持続Turn Rateが有利になりやすい流れ。",
+      related: "Two‑Circle / turn rate",
       href: "#circle-fight"
     },
     {
       term: "Plane of Motion",
       ja: "運動面",
       desc: "航空機が描く旋回円が置かれている面。実際の機動は3次元で考える。",
-      related: "In-plane / Out-of-plane",
+      related: "In‑plane / Out‑of‑plane",
       href: "#plane-motion"
     },
     {
-      term: "In-plane Maneuvering",
+      term: "In‑plane Maneuvering",
       ja: "同一面内の機動",
       desc: "2機の旋回面がほぼ同じ状態で行う機動。上面の2次元図で理解しやすい。",
-      related: "Plane of Motion / One-Circle",
+      related: "Plane of Motion / One‑Circle",
       href: "#plane-motion"
     },
     {
-      term: "Out-of-plane Maneuvering",
+      term: "Out‑of‑plane Maneuvering",
       ja: "異なる面を使う機動",
       desc: "一方が旋回面を傾け、垂直方向を含む別の面で行う機動。距離やエネルギーの調整につながる。",
       related: "Plane of Motion / energy",

@@ -110,6 +110,10 @@
   white-space: nowrap;
 }
 
+.hero-title-phrase {
+  display: inline;
+}
+
 .global-nav a::after {
   position: absolute;
   right: 0;

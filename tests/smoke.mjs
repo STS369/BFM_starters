@@ -438,7 +438,7 @@ async function run() {
   record(
     "最上部はサイトを作った目的を示す",
     basics.heroPurpose.aboutSitePurpose && !basics.heroPurpose.definitionLikeHeading &&
-      basics.heroPurpose.heading === "BFMの基礎を、迷わず" && basics.heroPurpose.verticallyStacked &&
+      basics.heroPurpose.heading === "BFMを、迷わず学ぶ" && basics.heroPurpose.verticallyStacked &&
       basics.heroPurpose.headingUsesWidth && basics.heroPurpose.headingOneLine,
     JSON.stringify(basics.heroPurpose)
   );
@@ -569,7 +569,7 @@ async function run() {
   );
   record(
     "グローバルナビは3つの学習区分と有効なリンク",
-    basics.globalNav.labels.join("|") === "BFMの基本|Offensive BFM|Defensive BFM" &&
+    basics.globalNav.labels.join("|") === "BFM入門|Offensive BFM|Defensive BFM" &&
       basics.globalNav.targets.length === 3 && basics.globalNav.validTargets,
     JSON.stringify(basics.globalNav)
   );
@@ -949,6 +949,27 @@ async function run() {
         const rect = element.getBoundingClientRect();
         return rect.left >= -1 && rect.right <= innerWidth + 1;
       };
+      const isSingleLine = (element) => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const lineTops = new Set([...range.getClientRects()]
+          .filter((rect) => rect.width > 0 && rect.height > 0)
+          .map((rect) => Math.round(rect.top)));
+        return lineTops.size <= 1 && element.scrollWidth <= element.clientWidth + 1;
+      };
+      const nav = document.querySelector("#global-nav");
+      const navWasOpen = nav.classList.contains("is-open");
+      nav.classList.add("is-open");
+      const navLabelsFit = [...nav.querySelectorAll("a")].every((element) =>
+        withinViewport(element) && isSingleLine(element)
+      );
+      if (!navWasOpen) nav.classList.remove("is-open");
+      const wrappedUiLabels = [...document.querySelectorAll(
+        ".button, .badge, .course-choice-meta > span"
+      )].filter((element) => getComputedStyle(element).whiteSpace !== "nowrap" ||
+        element.scrollWidth > element.clientWidth + 1
+      ).map((element) => element.textContent.trim());
+      const pageText = document.body.textContent;
       const welcomeMetrics = [...document.querySelectorAll(".welcome-message")].map((element) => {
         const rect = element.getBoundingClientRect();
         return {
@@ -970,6 +991,13 @@ async function run() {
         lessonTitlesFit: [...document.querySelectorAll(".lesson-title-text")].every((element) =>
           element.scrollWidth <= element.clientWidth + 1 && withinViewport(element)
         ),
+        heroTitlePhrasesFit: [...document.querySelectorAll(".hero-title-phrase")].every(withinViewport),
+        navLabelsFit,
+        uiLabelsOneLine: wrappedUiLabels.length === 0,
+        wrappedUiLabels,
+        protectedTermsUseNonBreakingHyphen:
+          /One‑Circle|Two‑Circle|In‑plane|Out‑of‑plane/.test(pageText) &&
+          !/One-Circle|Two-Circle|In-plane|Out-of-plane/.test(pageText),
         mobileColumns: gridElements.every((element) =>
           getComputedStyle(element).gridTemplateColumns.trim().split(/\\s+/).length === 1
         ),
@@ -986,8 +1014,9 @@ async function run() {
   record(
     "320〜430pxで主要レイアウトと操作領域が崩れない",
     phoneLayouts.every((layout) => layout.overflow <= 1 && layout.headerWithinViewport &&
-      layout.welcomeFits && layout.lessonTitlesFit && layout.mobileColumns && layout.indexHidden &&
-      layout.touchTargets && layout.tableWrapsWithinViewport),
+      layout.welcomeFits && layout.lessonTitlesFit && layout.heroTitlePhrasesFit && layout.navLabelsFit &&
+      layout.uiLabelsOneLine && layout.protectedTermsUseNonBreakingHyphen && layout.mobileColumns &&
+      layout.indexHidden && layout.touchTargets && layout.tableWrapsWithinViewport),
     JSON.stringify(phoneLayouts)
   );
 

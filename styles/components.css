@@ -61,18 +61,6 @@
   min-width: 0;
 }
 
-/* InfoStack: vertically stacked information with consistent spacing */
-.info-stack {
-  display: grid;
-  width: 100%;
-  gap: var(--component-stack-gap, 1rem);
-  align-content: start;
-}
-
-.info-stack > * {
-  min-width: 0;
-}
-
 /* CardGrid: variants define their own columns and visual treatment */
 .card-grid,
 .card-grid > * {

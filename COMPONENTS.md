@@ -32,10 +32,6 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 </header>
 ```
 
-## InfoStack
-
-同じ幅と間隔で縦に並ぶ補足情報です。現在は「制作背景」「サイトの目的」「お願い」に使用します。間隔は `--component-stack-gap` で変更できます。
-
 ## CardGrid / ContentCard
 
 `card-grid` はカードを並べる共通の外枠です。列数やカード固有の見た目は `comparison-cards`、`principle-grid`、`triad`、`two-term-grid`、`guns-grid`、`course-choice-grid` が担当します。
@@ -62,7 +58,9 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 ## 固有コンポーネント
 
-`WelcomeSequence`、`MissionReveal`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector` は、独立した名前と処理を維持します。
+`WelcomeSequence`、`MissionReveal`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector`、`SiteRequest`、`SiteAbout` は、独立した名前と処理を維持します。
+
+`SiteRequest` は第1章の学習手順のあとに置く控えめな注意欄です。`SiteAbout` はフッター内の「このサイトについて」として、学習を終えたあとに制作背景を読めるセクションです。
 
 `WelcomeSequence` の最初のメッセージは、スマホで不自然な位置に折り返さないよう「ようこそ」と「BFM Japanへ」を別の `span` にしています。文言を変更するときも、各行が320px幅に収まるか確認してください。
 

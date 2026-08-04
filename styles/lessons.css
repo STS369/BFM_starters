@@ -1717,6 +1717,36 @@ blockquote {
   font-size: 0.57rem;
 }
 
+.footer-about {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.footer-about-heading > p {
+  margin: 0 0 0.55rem;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.footer-about h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.footer-about > p {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.9;
+}
+
 .disclaimer {
   display: grid;
   grid-template-columns: 230px 1fr;

@@ -839,7 +839,9 @@
 }
 
 .hero-definition {
-  max-width: 42ch;
+  display: grid;
+  max-width: 68ch;
+  gap: 0.65rem;
   margin: 0 0 1rem;
   color: var(--text);
   font-size: var(--type-lead);
@@ -847,33 +849,6 @@
   line-height: 1.75;
 }
 
-.hero-purpose,
-.creator-note {
-  max-width: 64ch;
-  margin: 0 0 1rem;
-  color: var(--muted);
-  font-size: var(--type-small);
-  line-height: 1.8;
-}
-
-.hero-purpose span,
-.creator-note span {
-  display: inline-block;
-  margin-right: 0.7rem;
-  color: var(--cyan);
-  font-family: var(--font-mono);
-  font-size: var(--type-label);
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
-.creator-info {
-  max-width: 64ch;
-  margin-bottom: 1rem;
-}
-
-.creator-info > p {
-  width: 100%;
-  max-width: none;
-  margin: 0;
+.hero-definition > span {
+  display: block;
 }

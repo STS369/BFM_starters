@@ -205,9 +205,9 @@ async function run() {
       const combined = heading + " " + copy;
       return {
         heading,
-        aboutSitePurpose: combined.includes("このサイト") && combined.includes("目的"),
+        aboutSitePurpose: combined.includes("BFMに必要な用語と基本概念") && combined.includes("目指します"),
         definitionLikeHeading: /BFM\\s*とは|何のために存在する/.test(heading),
-        explainsPartScope: copy.includes("そのため、このパートではBFMにおいて必要な用語・基本概念を解説します。"),
+        explainsPartScope: copy.includes("このパートではBFMに必要な用語と基本概念を順序立てて解説します"),
         verticallyStacked: Boolean(copyBox && designBox && designBox.top >= copyBox.bottom - 1),
         headingUsesWidth: Boolean(headingBox && headingBox.right >= window.innerWidth * 0.7),
         headingOneLine: Boolean(headingElement && getComputedStyle(headingElement).whiteSpace === "nowrap")
@@ -275,30 +275,26 @@ async function run() {
         plainLabel: part.children.length === 0
       };
     })(),
-    creatorNote: (() => {
-      const note = document.querySelector(".creator-note");
-      const purpose = document.querySelector(".hero-purpose");
-      const request = document.querySelector(".creator-request");
-      const noteStyle = note ? getComputedStyle(note) : null;
-      const purposeStyle = purpose ? getComputedStyle(purpose) : null;
-      const requestStyle = request ? getComputedStyle(request) : null;
-      const boxes = [note, purpose, request].map((element) => element?.getBoundingClientRect());
+    siteContext: (() => {
+      const heroDefinition = document.querySelector(".hero-definition");
+      const guide = document.querySelector("#site-guide");
+      const checkpoint = guide?.querySelector(".checkpoint");
+      const request = guide?.querySelector(".site-request");
+      const background = document.querySelector("#site-background");
+      const next = document.querySelector("#next");
+      const footer = document.querySelector(".site-footer");
       return {
-        text: note?.textContent.trim() || "",
-        immediatelyBeforePurpose: Boolean(note && purpose && note.nextElementSibling === purpose),
-        visuallyBeforePurpose: Boolean(note && purpose && note.getBoundingClientRect().bottom <= purpose.getBoundingClientRect().top + 1),
-        matchingFormat: Boolean(noteStyle && purposeStyle &&
-          noteStyle.fontSize === purposeStyle.fontSize && noteStyle.color === purposeStyle.color &&
-          noteStyle.lineHeight === purposeStyle.lineHeight && noteStyle.borderInlineStartWidth === purposeStyle.borderInlineStartWidth),
-        labels: [note?.querySelector("span")?.textContent.trim() || "", purpose?.querySelector("span")?.textContent.trim() || ""],
-        requestText: request?.textContent.trim() || "",
-        requestAfterPurpose: Boolean(request && purpose && purpose.nextElementSibling === request &&
-          purpose.getBoundingClientRect().bottom <= request.getBoundingClientRect().top + 1),
-        requestMatchingFormat: Boolean(purposeStyle && requestStyle &&
-          purposeStyle.fontSize === requestStyle.fontSize && purposeStyle.color === requestStyle.color &&
-          purposeStyle.lineHeight === requestStyle.lineHeight),
-        equalWidths: boxes.every(Boolean) && Math.max(...boxes.map((box) => box.width)) - Math.min(...boxes.map((box) => box.width)) <= 1,
-        equalSpacing: boxes.every(Boolean) && Math.abs((boxes[1].top - boxes[0].bottom) - (boxes[2].top - boxes[1].bottom)) <= 1
+        purposeText: heroDefinition?.textContent.trim() || "",
+        purposeInHero: heroDefinition?.textContent.includes("自分の言葉でBFMを説明できることを目指します") || false,
+        legacyHeroStackRemoved: !document.querySelector(".creator-info, .creator-note, .hero-purpose, .creator-request"),
+        requestText: request?.textContent.trim().replace(/\\s+/g, " ") || "",
+        requestInGuide: Boolean(guide && request && guide.contains(request)),
+        requestAfterCheckpoint: Boolean(checkpoint && request && checkpoint.nextElementSibling === request),
+        backgroundTitle: background?.querySelector("h2")?.textContent.trim() || "",
+        backgroundText: background?.textContent.trim().replace(/\\s+/g, " ") || "",
+        backgroundInFooter: Boolean(background && footer && footer.contains(background)),
+        backgroundAfterNext: Boolean(background && next &&
+          (next.compareDocumentPosition(background) & Node.DOCUMENT_POSITION_FOLLOWING))
       };
     })(),
     componentArchitecture: (() => {
@@ -329,7 +325,7 @@ async function run() {
           Boolean(header.querySelector(".lesson-title .lesson-title-text")) &&
           Boolean(header.querySelector(".lesson-goal"))
         ),
-        infoStackItems: document.querySelectorAll(".info-stack > p").length,
+        legacyInfoStackRemoved: !document.querySelector(".info-stack"),
         callouts: callouts.length,
         calloutVariantsValid: callouts.every((callout) => [...callout.classList].some((name) => name.startsWith("callout-"))),
         cardGrids: cardGrids.length,
@@ -659,25 +655,31 @@ async function run() {
     JSON.stringify(basics.heroPartLabel)
   );
   record(
-    "このサイトの目的の直前に制作背景を表示",
-    basics.creatorNote.immediatelyBeforePurpose && basics.creatorNote.visuallyBeforePurpose && basics.creatorNote.matchingFormat &&
-      basics.creatorNote.text.includes("まとめノートとして制作しました") &&
-      basics.creatorNote.labels.join("|") === "制作背景|サイトの目的",
-    JSON.stringify(basics.creatorNote)
+    "サイトの目的をヒーロー説明文へ統合",
+    basics.siteContext.purposeInHero && basics.siteContext.legacyHeroStackRemoved &&
+      basics.siteContext.purposeText.includes("自分の言葉でBFMを説明できることを目指します"),
+    JSON.stringify(basics.siteContext)
   );
   record(
-    "サイトの目的の下にお願いを表示",
-    basics.creatorNote.requestAfterPurpose && basics.creatorNote.requestMatchingFormat &&
-      basics.creatorNote.equalWidths && basics.creatorNote.equalSpacing &&
-      basics.creatorNote.requestText ===
-        "お願い本サイトは初心者が初心者のためにつくりました。間違っている箇所があるかもしれませんが、ご容赦ください。",
-    JSON.stringify(basics.creatorNote)
+    "お願いを01の学習手順のあとに表示",
+    basics.siteContext.requestInGuide && basics.siteContext.requestAfterCheckpoint &&
+      basics.siteContext.requestText ===
+        "お願い 本サイトは初心者が初心者のためにつくりました。間違っている箇所があるかもしれませんが、ご容赦ください。",
+    JSON.stringify(basics.siteContext)
+  );
+  record(
+    "制作背景をフッターのこのサイトについてへ表示",
+    basics.siteContext.backgroundInFooter && basics.siteContext.backgroundAfterNext &&
+      basics.siteContext.backgroundTitle === "このサイトについて" &&
+      basics.siteContext.backgroundText.includes("ABOUT BFM JAPAN このサイトについて") &&
+      basics.siteContext.backgroundText.includes("まとめノートとして制作しました"),
+    JSON.stringify(basics.siteContext)
   );
   record(
     "共通コンポーネント契約を既存UIへ適用",
     basics.componentArchitecture.componentStylesheet && basics.componentArchitecture.layeredStylesheets &&
       basics.componentArchitecture.lessonHeaders === 18 &&
-      basics.componentArchitecture.lessonStructureValid && basics.componentArchitecture.infoStackItems === 3 &&
+      basics.componentArchitecture.lessonStructureValid && basics.componentArchitecture.legacyInfoStackRemoved &&
       basics.componentArchitecture.callouts >= 20 && basics.componentArchitecture.calloutVariantsValid &&
       basics.componentArchitecture.cardGrids >= 10 && basics.componentArchitecture.quizCards === 12 &&
       basics.componentArchitecture.glossaryCards >= 45 && basics.componentArchitecture.courseCards === 2 &&
@@ -1144,8 +1146,10 @@ async function run() {
 
   if (process.env.SCREENSHOT_DIR) {
     const desktopContentTargets = [
+      ["part-one-hero", "bfm-desktop-part-one-hero.png"],
       ["geometry", "bfm-desktop-geometry.png"],
-      ["turn-space-model", "bfm-desktop-turn-space-model.png"]
+      ["turn-space-model", "bfm-desktop-turn-space-model.png"],
+      ["site-background", "bfm-desktop-site-background.png"]
     ];
     const previousScrollBehavior = await evaluate(socket, "document.documentElement.style.scrollBehavior");
     await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
@@ -1168,11 +1172,13 @@ async function run() {
   await captureScreenshot(socket, "bfm-mobile-cdp.png");
   if (process.env.SCREENSHOT_DIR) {
     const mobileScreenshotTargets = [
+      ["part-one-hero", "bfm-mobile-part-one-hero.png"],
       ["overview", "bfm-mobile-overview.png"],
       ["geometry", "bfm-mobile-geometry.png"],
       ["turn-space-model", "bfm-mobile-turn-space-model.png"],
       ["circle-fight", "bfm-mobile-circle-fight.png"],
       ["glossary", "bfm-mobile-glossary.png"],
+      ["site-background", "bfm-mobile-site-background.png"],
       ["next", "bfm-mobile-next.png"]
     ];
     const previousScrollBehavior = await evaluate(socket, "document.documentElement.style.scrollBehavior");

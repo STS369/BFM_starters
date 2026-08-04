@@ -6,7 +6,7 @@
 /* Scroll-led welcome before PART 1 */
 .welcome-sequence {
   position: relative;
-  min-height: 220svh;
+  min-height: 320svh;
   overflow: clip;
   border-bottom: 1px solid var(--line-soft);
   background:
@@ -36,8 +36,50 @@
   opacity: 0.8;
 }
 
+.welcome-video-scene {
+  --scene-opacity: 0;
+  --video-progress: 0;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #02080d;
+  opacity: var(--scene-opacity);
+  pointer-events: none;
+  transition: opacity 0.12s linear;
+  will-change: opacity;
+}
+
+.welcome-video-scene.is-video-unavailable {
+  display: none;
+}
+
+.welcome-takeoff-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.92) contrast(1.05) brightness(0.82);
+  transform: scale(1.08);
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.welcome-video-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to bottom, rgba(2, 8, 13, 0.24), rgba(2, 8, 13, 0.05) 48%, rgba(2, 8, 13, 0.36)),
+    radial-gradient(ellipse at center, transparent 34%, rgba(2, 8, 13, 0.58) 100%);
+}
+
 .welcome-stage {
   position: relative;
+  z-index: 5;
   width: min(1120px, calc(100% - 2rem));
   min-height: min(56vh, 560px);
 }
@@ -80,6 +122,15 @@
   transform: translateY(28px) scale(0.97);
 }
 
+.welcome-message-final {
+  max-width: 12ch;
+  margin-inline: auto;
+  font-size: clamp(2.5rem, 6.2vw, 6rem);
+  opacity: 0;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.72);
+  transform: translateY(28px) scale(0.97);
+}
+
 .welcome-scroll-cue {
   position: absolute;
   bottom: clamp(1.25rem, 4vh, 2.5rem);
@@ -119,6 +170,10 @@ html:not(.js-enabled) .welcome-stage {
   min-height: 0;
 }
 
+html:not(.js-enabled) .welcome-video-scene {
+  display: none;
+}
+
 html:not(.js-enabled) .welcome-message {
   position: static;
   opacity: 1;
@@ -127,7 +182,7 @@ html:not(.js-enabled) .welcome-message {
 
 @media (max-width: 720px) {
   .welcome-sequence {
-    min-height: 200svh;
+    min-height: 300svh;
   }
 
   .welcome-stage {
@@ -144,11 +199,20 @@ html:not(.js-enabled) .welcome-message {
     padding-inline: 0.25rem;
     font-size: clamp(1.55rem, 7.2vw, 2.6rem);
   }
+
+  .welcome-message-final {
+    max-width: 100%;
+    font-size: clamp(2rem, 9.5vw, 3.2rem);
+  }
+
+  .welcome-takeoff-video {
+    transform: scale(1.1);
+  }
 }
 
 @media (max-width: 940px) and (orientation: landscape) and (max-height: 600px) {
   .welcome-sequence {
-    min-height: 180svh;
+    min-height: 260svh;
   }
 
   .welcome-stage {
@@ -162,6 +226,10 @@ html:not(.js-enabled) .welcome-message {
   .welcome-message-secondary {
     max-width: min(22ch, 100%);
     font-size: clamp(1.4rem, 4.5vw, 2.25rem);
+  }
+
+  .welcome-message-final {
+    font-size: clamp(1.8rem, 5.4vw, 2.8rem);
   }
 
   .welcome-scroll-cue {
@@ -192,6 +260,10 @@ html:not(.js-enabled) .welcome-message {
     position: static;
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .welcome-video-scene {
+    display: none;
   }
 
   .welcome-scroll-cue {

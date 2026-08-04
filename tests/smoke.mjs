@@ -217,12 +217,22 @@ async function run() {
       const section = document.querySelector("#welcome");
       const sticky = section?.querySelector(".welcome-sticky");
       const messages = [...(section?.querySelectorAll(".welcome-message") || [])];
+      const scene = section?.querySelector("[data-welcome-video-scene]");
+      const video = scene?.querySelector("[data-welcome-video]");
       return {
         beforePart1: Boolean(section && section.nextElementSibling?.classList.contains("hero")),
         messages: messages.map((message) => message.textContent.trim()),
         sticky: sticky ? getComputedStyle(sticky).position === "sticky" : false,
         heightRatio: section ? section.getBoundingClientRect().height / innerHeight : 0,
-        initialOpacities: messages.map((message) => parseFloat(getComputedStyle(message).opacity))
+        initialOpacities: messages.map((message) => parseFloat(getComputedStyle(message).opacity)),
+        videoScene: Boolean(scene),
+        initialSceneOpacity: scene ? parseFloat(getComputedStyle(scene).opacity) : -1,
+        video: Boolean(video),
+        source: video?.dataset.src || "",
+        muted: video?.muted || false,
+        playsInline: video?.playsInline || false,
+        preload: video?.preload || "",
+        legacyMotionRemoved: !scene?.querySelector("svg, .takeoff-runway, .takeoff-aircraft")
       };
     })(),
     missionReveals: (() => {
@@ -575,10 +585,16 @@ async function run() {
   );
   record(
     "PART 1の前にスクロール連動ウェルカムを表示",
-    basics.welcomeSequence.beforePart1 && basics.welcomeSequence.sticky && basics.welcomeSequence.heightRatio >= 1.9 &&
+    basics.welcomeSequence.beforePart1 && basics.welcomeSequence.sticky && basics.welcomeSequence.heightRatio >= 2.8 &&
       basics.welcomeSequence.messages.join("|") ===
-        "ようこそBFM Japanへ|ここではドックファイトにおいて必要なBFMを学ぶことができます" &&
-      basics.welcomeSequence.initialOpacities[0] >= 0.99 && basics.welcomeSequence.initialOpacities[1] <= 0.01,
+        "ようこそBFM Japanへ|ここではドックファイトにおいて必要なBFMを学ぶことができます|さあ始めましょう" &&
+      basics.welcomeSequence.initialOpacities[0] >= 0.99 &&
+      basics.welcomeSequence.initialOpacities.slice(1).every((opacity) => opacity <= 0.01) &&
+      basics.welcomeSequence.videoScene && basics.welcomeSequence.video &&
+      basics.welcomeSequence.source === "assets/welcome-takeoff.mp4" &&
+      basics.welcomeSequence.muted && basics.welcomeSequence.playsInline &&
+      basics.welcomeSequence.preload === "auto" && basics.welcomeSequence.legacyMotionRemoved &&
+      basics.welcomeSequence.initialSceneOpacity <= 0.01,
     JSON.stringify(basics.welcomeSequence)
   );
   record(
@@ -594,24 +610,96 @@ async function run() {
   );
   const welcomeSamples = [];
   await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
-  for (const ratio of [0.6, 0.75, 0.9, 1]) {
+  for (const ratio of [0.28, 0.4, 0.56, 0.7, 0.82, 0.92, 1]) {
     await evaluate(socket, `(() => {
       const section = document.querySelector("#welcome");
       const distance = Math.max(1, section.offsetHeight - innerHeight);
       window.scrollTo(0, section.offsetTop + distance * ${ratio});
     })()`);
-    await wait(100);
+    await wait(180);
     welcomeSamples.push(await evaluate(socket, `(() => ({
       ratio: ${ratio},
       first: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="1"]')).opacity),
-      second: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="2"]')).opacity)
+      second: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="2"]')).opacity),
+      third: parseFloat(getComputedStyle(document.querySelector('[data-welcome-step="3"]')).opacity),
+      scene: parseFloat(getComputedStyle(document.querySelector('[data-welcome-video-scene]')).opacity),
+      videoProgress: parseFloat(getComputedStyle(document.querySelector('[data-welcome-video-scene]')).getPropertyValue('--video-progress')) || 0,
+      currentTime: document.querySelector('[data-welcome-video]').currentTime,
+      duration: Number.isFinite(document.querySelector('[data-welcome-video]').duration) ? document.querySelector('[data-welcome-video]').duration : 0,
+      readyState: document.querySelector('[data-welcome-video]').readyState,
+      paused: document.querySelector('[data-welcome-video]').paused,
+      objectFit: getComputedStyle(document.querySelector('[data-welcome-video]')).objectFit,
+      videoTransform: getComputedStyle(document.querySelector('[data-welcome-video]')).transform
+    }))()`));
+    if (process.env.SCREENSHOT_DIR && ratio === 0.82) {
+      await captureScreenshot(socket, "bfm-welcome-video-middle-desktop.png");
+    }
+    if (process.env.SCREENSHOT_DIR && ratio === 0.92) {
+      await wait(900);
+      await captureScreenshot(socket, "bfm-welcome-video-end-desktop.png");
+    }
+  }
+  await wait(1600);
+  const videoEndState = await evaluate(socket, `(() => {
+    const video = document.querySelector('[data-welcome-video]');
+    return {
+      currentTime: video.currentTime,
+      duration: video.duration,
+      paused: video.paused
+    };
+  })()`);
+  const secondTransition = welcomeSamples.reduce((best, sample) => sample.second > best.second ? sample : best);
+  const thirdTransition = welcomeSamples.reduce((best, sample) => sample.third > best.third ? sample : best);
+  record(
+    "スクロールに応じて3つの案内を順番に表示",
+    secondTransition.first <= 0.05 && secondTransition.second >= 0.75 &&
+      thirdTransition.second <= 0.05 && thirdTransition.third >= 0.75,
+    JSON.stringify(welcomeSamples)
+  );
+  record(
+    "指定動画を少し拡大してスクロール再生",
+    welcomeSamples.some((sample) => sample.scene >= 0.75) &&
+      Math.max(...welcomeSamples.map((sample) => sample.videoProgress)) >= 0.9 &&
+      Math.max(...welcomeSamples.map((sample) => sample.duration)) > 0 &&
+      videoEndState.duration > 0 && videoEndState.currentTime / videoEndState.duration >= 0.95 &&
+      videoEndState.paused && welcomeSamples.some((sample) => !sample.paused) &&
+      welcomeSamples.every((sample, index) => index === 0 || sample.currentTime >= welcomeSamples[index - 1].currentTime - 0.03) &&
+      welcomeSamples.some((sample) => sample.readyState >= 1) &&
+      welcomeSamples.every((sample) => sample.objectFit === "cover" && sample.videoTransform !== "none"),
+    JSON.stringify({ welcomeSamples, videoEndState })
+  );
+  const reverseSamples = [];
+  for (const ratio of [0.92, 0.82, 0.7]) {
+    await evaluate(socket, `(() => {
+      const section = document.querySelector("#welcome");
+      const distance = Math.max(1, section.offsetHeight - innerHeight);
+      window.scrollTo(0, section.offsetTop + distance * ${ratio});
+    })()`);
+    await wait(140);
+    reverseSamples.push(await evaluate(socket, `(() => ({
+      ratio: ${ratio},
+      currentTime: document.querySelector('[data-welcome-video]').currentTime,
+      paused: document.querySelector('[data-welcome-video]').paused
     }))()`));
   }
-  const welcomeTransition = welcomeSamples.reduce((best, sample) => sample.second > best.second ? sample : best);
+  await evaluate(socket, `(() => {
+    const section = document.querySelector("#welcome");
+    const distance = Math.max(1, section.offsetHeight - innerHeight);
+    window.scrollTo(0, section.offsetTop + distance * 0.4);
+  })()`);
+  await wait(160);
+  const videoResetState = await evaluate(socket, `(() => ({
+    currentTime: document.querySelector('[data-welcome-video]').currentTime,
+    paused: document.querySelector('[data-welcome-video]').paused,
+    scene: parseFloat(getComputedStyle(document.querySelector('[data-welcome-video-scene]')).opacity)
+  }))()`);
   record(
-    "スクロールに応じて2つ目の案内へ切り替わる",
-    welcomeTransition.first <= 0.05 && welcomeTransition.second >= 0.75,
-    JSON.stringify(welcomeSamples)
+    "上方向のスクロールでは動画を逆再生しない",
+    reverseSamples.every((sample, index) =>
+      sample.currentTime >= (index === 0 ? videoEndState.currentTime : reverseSamples[index - 1].currentTime) - 0.04
+    ) && reverseSamples.every((sample) => sample.paused) &&
+      videoResetState.scene <= 0.01 && videoResetState.currentTime <= 0.05 && videoResetState.paused,
+    JSON.stringify({ videoEndState, reverseSamples, videoResetState })
   );
   const missionRevealSamples = [];
   for (const phase of ["entry", "focus", "exit"]) {
@@ -1059,11 +1147,14 @@ async function run() {
   await command(socket, "Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-motion", value: "reduce" }]
   });
+  await wait(80);
   const reducedMotion = await evaluate(socket, `(() => ({
     scroll: getComputedStyle(document.documentElement).scrollBehavior,
     transitionSeconds: parseFloat(getComputedStyle(document.querySelector(".button")).transitionDuration) || 0,
     welcomePosition: getComputedStyle(document.querySelector(".welcome-sticky")).position,
     welcomeOpacities: [...document.querySelectorAll(".welcome-message")].map((message) => parseFloat(getComputedStyle(message).opacity)),
+    videoDisplay: getComputedStyle(document.querySelector("[data-welcome-video-scene]")).display,
+    videoPaused: document.querySelector("[data-welcome-video]").paused,
     missionPosition: getComputedStyle(document.querySelector(".mission-reveal-sticky")).position,
     missionOpacities: [...document.querySelectorAll(".mission-reveal-copy")].map((copy) => parseFloat(getComputedStyle(copy).opacity))
   }))()`);
@@ -1071,11 +1162,12 @@ async function run() {
     "動きを減らす設定に対応",
     reducedMotion.scroll === "auto" && reducedMotion.transitionSeconds <= 0.000001 &&
       reducedMotion.welcomePosition === "relative" && reducedMotion.welcomeOpacities.every((opacity) => opacity === 1) &&
+      reducedMotion.videoDisplay === "none" && reducedMotion.videoPaused &&
       reducedMotion.missionPosition === "relative" && reducedMotion.missionOpacities.every((opacity) => opacity === 1),
     JSON.stringify(reducedMotion)
   );
   await command(socket, "Emulation.setEmulatedMedia", {
-    features: [{ name: "prefers-reduced-motion", value: "no-preference" }]
+    features: []
   });
 
   const glossary = await evaluate(socket, `(() => {
@@ -1328,6 +1420,16 @@ async function run() {
       };
     })()`));
     if (width === 390 && process.env.SCREENSHOT_DIR) {
+      await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
+      await evaluate(socket, `(() => {
+        const section = document.querySelector("#welcome");
+        const distance = Math.max(1, section.offsetHeight - innerHeight);
+        window.scrollTo(0, section.offsetTop + distance * 0.82);
+      })()`);
+      await wait(900);
+      await captureScreenshot(socket, "bfm-welcome-video-mobile.png");
+      await evaluate(socket, "window.scrollTo(0, 0)");
+      await wait(80);
       await evaluate(socket, 'document.querySelector("#mission-index-menu > summary").click()');
       await wait(80);
       await captureScreenshot(socket, "bfm-header-toc-mobile.png");

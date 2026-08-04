@@ -24,7 +24,7 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 <header class="module-header lesson-header">
   <div>
     <h2 class="numbered-module-title lesson-title">
-      <span class="module-title-number lesson-number">01:</span>
+      <span class="module-title-number lesson-number">02:</span>
       <span class="module-title-text lesson-title-text">BFMとは何か</span>
     </h2>
   </div>
@@ -79,7 +79,7 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 - `src/partials/` — Header、WelcomeSequence、Hero、MissionIndex、Footer
 - `src/missions/` — MISSION 01〜18の導入画面と本文
 
-`src/app.template.html` の `<!-- @include missions/01-overview.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。展開結果は `scripts/generated-content.js` へ生成され、`scripts/content-loader.js` が既存コンポーネントの初期化前に `index.html` の表示先へ挿入します。通信によるHTML取得は行わないため、HTTP公開時とWindowsからの直接表示の両方で動作します。
+`src/app.template.html` の `<!-- @include missions/01-site-guide.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。展開結果は `scripts/generated-content.js` へ生成され、`scripts/content-loader.js` が既存コンポーネントの初期化前に `index.html` の表示先へ挿入します。通信によるHTML取得は行わないため、HTTP公開時とWindowsからの直接表示の両方で動作します。
 
 ```powershell
 node tools/build-html.mjs

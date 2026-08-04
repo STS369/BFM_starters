@@ -293,6 +293,12 @@ html:not(.js-enabled) .welcome-message {
   word-break: keep-all;
 }
 
+#site-guide .mission-reveal-title {
+  max-width: 100%;
+  font-size: clamp(2.3rem, 5vw, 5rem);
+  white-space: nowrap;
+}
+
 .mission-reveal-cue {
   position: absolute;
   bottom: clamp(1.1rem, 3vh, 2rem);
@@ -358,6 +364,11 @@ html:not(.js-enabled) .mission-reveal-cue {
     max-width: min(100%, 13ch);
     font-size: clamp(2rem, 10vw, 3.5rem);
     letter-spacing: -0.045em;
+  }
+
+  #site-guide .mission-reveal-title {
+    max-width: 100%;
+    font-size: clamp(1.65rem, 8vw, 2.8rem);
   }
 }
 

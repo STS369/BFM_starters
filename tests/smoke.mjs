@@ -378,6 +378,19 @@ async function run() {
       return number && Math.abs(parseFloat(getComputedStyle(number).fontSize) - parseFloat(getComputedStyle(item).fontSize)) < 0.5;
     }),
     heroStatsRemoved: !document.querySelector(".hero-stats"),
+    siteGuide: (() => {
+      const guide = document.querySelector("#site-guide");
+      const sequences = [...document.querySelectorAll(".mission-sequence")];
+      return {
+        firstMission: sequences[0]?.id || "",
+        revealTitle: guide?.querySelector(".mission-reveal-title")?.textContent.trim() || "",
+        moduleTitle: guide?.querySelector(".module-title-text")?.textContent.trim() || "",
+        indexLabel: document.querySelector('.mission-index-list a[href="#site-guide"]')?.textContent.trim().replace(/\s+/g, " ") || "",
+        partTitles: [...(guide?.querySelectorAll(".part-card h3") || [])].map((heading) => heading.textContent.trim()),
+        steps: [...(guide?.querySelectorAll(".fundamentals-path h3") || [])].map((heading) => heading.textContent.trim()),
+        text: guide?.textContent.replace(/\s+/g, " ").trim() || ""
+      };
+    })(),
     punctuationPolicy: {
       titlesWithFullStop: [...document.querySelectorAll(".hero-part-label, h1, h2, h3, h4")]
         .map((title) => title.textContent.trim())
@@ -606,7 +619,7 @@ async function run() {
   const missionRevealSamples = [];
   for (const phase of ["entry", "focus", "exit"]) {
     await evaluate(socket, `(() => {
-      const reveal = document.querySelector("#overview [data-mission-reveal]");
+      const reveal = document.querySelector("#site-guide [data-mission-reveal]");
       const revealTop = reveal.getBoundingClientRect().top + scrollY;
       const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
       const distance = Math.max(1, reveal.offsetHeight - (innerHeight - headerHeight));
@@ -619,7 +632,7 @@ async function run() {
     })()`);
     await wait(100);
     missionRevealSamples.push(await evaluate(socket, `(() => {
-      const copy = document.querySelector("#overview .mission-reveal-copy");
+      const copy = document.querySelector("#site-guide .mission-reveal-copy");
       return {
         phase: "${phase}",
         opacity: parseFloat(getComputedStyle(copy).opacity),
@@ -722,11 +735,24 @@ async function run() {
       basics.numberedModuleHeadings.every((item, index) =>
         item.number === `${String(index + 1).padStart(2, "0")}:` && !item.hasStandaloneCode
       ) &&
-      basics.numberedModuleHeadings[0]?.text === "01:BFMとは何か" &&
+      basics.numberedModuleHeadings[0]?.text === "01:このサイトの進め方" &&
+      basics.numberedModuleHeadings[1]?.text === "02:BFMとは何か" &&
       basics.numberedModuleHeadings.every((item) =>
         item.numberSize > item.titleSize && item.numberAboveTitle && item.titleOneLine
       ),
     JSON.stringify(basics.numberedModuleHeadings)
+  );
+  record(
+    "01で3つのPartに共通する学び方を案内",
+    basics.siteGuide.firstMission === "site-guide" &&
+      basics.siteGuide.revealTitle === "このサイトの進め方" &&
+      basics.siteGuide.moduleTitle === "このサイトの進め方" &&
+      basics.siteGuide.indexLabel === "01このサイトの進め方" &&
+      basics.siteGuide.partTitles.join("|") === "BFM入門|Offensive BFM|Defensive BFM" &&
+      basics.siteGuide.steps.join("|") ===
+        "目的を確認する|用語と関係を理解する|状況を比較する|要点を説明する|理解を確認する" &&
+      basics.siteGuide.text.includes("学び方は共通です"),
+    JSON.stringify(basics.siteGuide)
   );
   record(
     "左目次とスプリッターを撤去し右上を目次に変更",
@@ -1301,7 +1327,7 @@ async function run() {
       await evaluate(socket, 'document.querySelector("#toc-close").click()');
       await evaluate(socket, `(() => {
         document.documentElement.style.scrollBehavior = "auto";
-        const reveal = document.querySelector("#overview [data-mission-reveal]");
+        const reveal = document.querySelector("#site-guide [data-mission-reveal]");
         const revealTop = reveal.getBoundingClientRect().top + scrollY;
         const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
         const distance = Math.max(1, reveal.offsetHeight - (innerHeight - headerHeight));

@@ -128,7 +128,7 @@ py -m http.server 4173
 4. **Build and deployment** のSourceを **Deploy from a branch** にします
 5. Branchに既定ブランチ、Folderに `/(root)` を選び、Saveします
 6. 表示された公開URLでCSS、JavaScript、ページ内リンクを再確認します
-7. 公開URLが決まったら、`src/index.template.html` のコメント位置に `canonical` と `og:url` を追加して再生成します。`og:image`も必要に応じて絶対URLへ変更します
+7. `canonical` と `og:url` は正式な公開先 `https://bfm-starters.netlify.app/` に統一しています。公開ドメインを変更した場合だけ更新して再生成します
 
 すべての内部資産は相対パスなので、`https://ユーザー名.github.io/リポジトリ名/` のサブパスでも動作します
 

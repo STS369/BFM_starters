@@ -1,6 +1,6 @@
 # BFM STARTER
 
-日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材です。公開時はHTML5、CSS3、Vanilla JavaScriptだけで動作します。編集用HTMLは章ごとに分割し、依存ライブラリのないNode.jsスクリプトで1枚の `index.html` へまとめます。
+日本人の初心者が「何を、どの順番で学ぶか」に迷わず、Basic Fighter Maneuvers（BFM：基本戦闘機動）を定義・位置・角度・エネルギーの順に学べるよう作った静的Web教材です。公開時はHTML5、CSS3、Vanilla JavaScriptだけで動作します。編集用HTMLは章ごとに分割し、依存ライブラリのないNode.jsスクリプトで、短い `index.html` と本文を保持する `scripts/generated-content.js` を生成します。
 
 ## 1. 設計方針
 
@@ -11,7 +11,7 @@
 - 最上部でサイトの制作目的を伝え、上部ナビゲーションから「BFM入門」「Offensive BFM」「Defensive BFM」の3系統へ移動できます
 - 左固定目次とスプリッターは使用せず、ヘッダー右上の単独の「目次」から18章を開きます。項目を選ぶと対応するMISSION導入へ移動します
 - 各章へ入る前に、章番号とタイトルをApple風のスクロール連動表示で案内します。背景とグリッドは最上部の「ようこそBFM Starterへ」と統一し、本文との間に別パネルのような視差が生まれない構成です
-- 動きを減らす設定やJavaScript無効時は、各MISSION導入を短い静的見出しとして表示します
+- 動きを減らす設定ではスクロール演出を静的表示へ切り替えます。JavaScript無効時は本文の代わりに有効化案内を表示します
 - PART 01を完成範囲とし、確認問題を終えたあとにPART 02と03を選ぶ修了導線にしています
 - 不明瞭になりやすい定義は、ユーザー提供の『Basic Employment Manual F-16C』第4章を照合し、図版や長文を転載せず初心者向けに要約しています
 - セクションID、共通カード、共通ナビゲーションを再利用し、将来の複数ページ化に備えています
@@ -43,9 +43,10 @@
 
 ```text
 DogfightLecture/
-├── index.html          # 公開用の生成済み単一ページ（直接編集しない）
+├── index.html          # 公開用の短い表示シェル（直接編集しない）
 ├── src/
-│   ├── index.template.html  # head、ページ外枠、CSS・JSの読み込み順
+│   ├── index.template.html  # head、表示先、CSS・JSの読み込み順
+│   ├── app.template.html    # 本文外枠とHTML部品の読み込み順
 │   ├── partials/            # ヘッダー、ウェルカム、ヒーロー、目次、フッター
 │   └── missions/            # 01〜18の章本文と章導入画面
 ├── tools/
@@ -61,6 +62,8 @@ DogfightLecture/
 │   ├── glossary.css     # 用語検索と用語カード
 │   └── responsive.css   # 画面幅・動き軽減・読みやすさ
 ├── scripts/
+│   ├── generated-content.js     # ビルドで生成する本文データ（直接編集しない）
+│   ├── content-loader.js        # 生成本文を表示先へ挿入
 │   ├── main.js                  # window.BFMに登録されたUIの起動処理
 │   ├── utils/dom.js             # DOM共通処理
 │   ├── data/
@@ -89,7 +92,7 @@ DogfightLecture/
     └── reference-usn-circle-flow.png
 ```
 
-公開されるのは従来どおり1枚の静的ページです。編集後だけ `node tools/build-html.mjs` を実行し、生成済み `index.html` も一緒にコミットします。実行時の `fetch()` や外部テンプレート読み込みは使わないため、Windowsからの直接表示とGitHub Pagesの両方で動作します。CSSとJavaScriptは `src/index.template.html` に記載された順で読み込みます。
+公開される画面は従来どおり1枚の静的ページです。編集後だけ `node tools/build-html.mjs` を実行し、生成済み `index.html` と `scripts/generated-content.js` を一緒にコミットします。実行時の `fetch()` や外部テンプレート読み込みは使わず、通常の外部JavaScriptとして本文を読み込むため、JavaScriptが有効ならWindowsからの直接表示とGitHub Pagesの両方で動作します。CSSとJavaScriptは `src/index.template.html` に記載された順で読み込みます。
 
 ## 4. ローカルで確認する
 
@@ -100,7 +103,7 @@ node tools/build-html.mjs
 node tools/build-html.mjs --check
 ```
 
-1つ目は公開用 `index.html` を生成し、2つ目は生成し忘れがないかだけを確認します。生成後の `index.html` はWindowsのエクスプローラーから直接開いても動作します。HTTP経由でGitHub Pagesに近い形を確認する場合は、続けて次を実行します。
+1つ目は公開用 `index.html` と `scripts/generated-content.js` を生成し、2つ目は生成し忘れがないかだけを確認します。生成後の `index.html` はWindowsのエクスプローラーから直接開いても動作します。HTTP経由でGitHub Pagesに近い形を確認する場合は、続けて次を実行します。
 
 ```powershell
 py -m http.server 4173
@@ -120,7 +123,7 @@ py -m http.server 4173
 ## 6. GitHub Pagesで公開する
 
 1. `node tools/build-html.mjs --check` が成功することを確認します
-2. `src/` と生成済み `index.html` を含む変更をGitHubリポジトリへコミットして、既定ブランチへpushします
+2. `src/`、生成済み `index.html`、`scripts/generated-content.js` を含む変更をGitHubリポジトリへコミットして、既定ブランチへpushします
 3. GitHubのリポジトリ画面で **Settings → Pages** を開きます
 4. **Build and deployment** のSourceを **Deploy from a branch** にします
 5. Branchに既定ブランチ、Folderに `/(root)` を選び、Saveします
@@ -232,7 +235,7 @@ git push origin main
 - [ ] 引用画像に内容を説明する`alt`と、第17章へ移動する小さな参照番号がある
 - [ ] 選択・正誤・危険度が色だけでなく文字でも分かる
 - [ ] `prefers-reduced-motion: reduce`で装飾アニメーションが停止する
-- [ ] JavaScript無効時も本文、学習目標、要点、注意事項を読める
+- [ ] JavaScript無効時は本文の代わりに有効化と再読み込みの案内が表示される
 - [ ] 200%ズームと320px幅で情報や操作を失わない
 - [ ] NVDA + Edge/Chromeなどでナビ、タブ、クイズ、検索を一巡する
 

@@ -72,25 +72,28 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 ## HTMLコンポーネントと生成
 
-公開ページは単一の `index.html` ですが、編集用ソースは次の単位へ分割しています。
+公開ページは単一ページのまま、`index.html` を表示枠だけにして、本文を生成済みJavaScriptから組み立てます。編集用ソースは次の単位へ分割しています。
 
-- `src/index.template.html` — ページ外枠と読み込み順
+- `src/index.template.html` — head、表示先、JavaScriptの読み込み順
+- `src/app.template.html` — ページ本文の外枠とHTML部品の読み込み順
 - `src/partials/` — Header、WelcomeSequence、Hero、MissionIndex、Footer
 - `src/missions/` — MISSION 01〜18の導入画面と本文
 
-テンプレートの `<!-- @include missions/01-overview.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。実行時のHTML取得は行わず、公開用 `index.html` にすべての本文を含めます。
+`src/app.template.html` の `<!-- @include missions/01-overview.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。展開結果は `scripts/generated-content.js` へ生成され、`scripts/content-loader.js` が既存コンポーネントの初期化前に `index.html` の表示先へ挿入します。通信によるHTML取得は行わないため、HTTP公開時とWindowsからの直接表示の両方で動作します。
 
 ```powershell
 node tools/build-html.mjs
 node tools/build-html.mjs --check
 ```
 
-`index.html` は生成物なので直接編集しません。変更は `src/` へ行い、生成済みファイルもコミットします。
+`index.html` と `scripts/generated-content.js` は生成物なので直接編集しません。変更は `src/` へ行い、2つの生成済みファイルもコミットします。
 
 ## JavaScriptコンポーネント
 
-HTML本文は編集時だけファイルを分割し、公開前に1枚へ結合します。JavaScript無効時にも本文を読め、HTTP公開時とWindowsからの直接表示の両方で動作します。操作機能は読み込み順付きの通常スクリプトへ分けます。
+HTML本文は編集時にファイルを分割し、公開前に `scripts/generated-content.js` へまとめます。JavaScriptが有効な環境ではHTTP公開時とWindowsからの直接表示の両方で動作します。JavaScript無効時は本文の代わりに有効化案内を表示します。操作機能は読み込み順付きの通常スクリプトへ分けます。
 
+- `scripts/generated-content.js` — ビルドで生成する本文データ
+- `scripts/content-loader.js` — 本文を表示先へ挿入する起動前処理
 - `scripts/main.js` — 起動順を管理するエントリーポイント
 - `scripts/data/` — 確認問題と用語のデータ
 - `scripts/utils/dom.js` — DOM共通処理
@@ -117,5 +120,5 @@ HTML本文は編集時だけファイルを分割し、公開前に1枚へ結合
 2. 既存の機能クラスは削除せず、共通クラスと組み合わせます。
 3. 9つのCSSファイルの読み込み順を維持します。
 4. 1440px、768px、430px、390px、375px、360px、320pxと `prefers-reduced-motion` を確認します。
-5. `tests/smoke.mjs` で表示、操作、JavaScript無効時の状態を確認します。
-6. `node tools/build-html.mjs --check` で公開用HTMLが最新か確認します。
+5. `tests/smoke.mjs` で表示、操作、本文の挿入、JavaScript無効時の案内を確認します。
+6. `node tools/build-html.mjs --check` で公開用HTMLと生成コンテンツが最新か確認します。

@@ -207,6 +207,7 @@ async function run() {
         heading,
         aboutSitePurpose: combined.includes("このサイト") && combined.includes("目的"),
         definitionLikeHeading: /BFM\\s*とは|何のために存在する/.test(heading),
+        explainsPartScope: copy.includes("そのため、このパートではBFMにおいて必要な用語・基本概念を解説します。"),
         verticallyStacked: Boolean(copyBox && designBox && designBox.top >= copyBox.bottom - 1),
         headingUsesWidth: Boolean(headingBox && headingBox.right >= window.innerWidth * 0.7),
         headingOneLine: Boolean(headingElement && getComputedStyle(headingElement).whiteSpace === "nowrap")
@@ -572,8 +573,8 @@ async function run() {
   record(
     "最上部はサイトを作った目的を示す",
     basics.heroPurpose.aboutSitePurpose && !basics.heroPurpose.definitionLikeHeading &&
-      basics.heroPurpose.heading === "BFMを、迷わず学ぶ" && basics.heroPurpose.verticallyStacked &&
-      basics.heroPurpose.headingUsesWidth && basics.heroPurpose.headingOneLine,
+      basics.heroPurpose.heading === "BFM入門" && basics.heroPurpose.explainsPartScope &&
+      basics.heroPurpose.verticallyStacked && basics.heroPurpose.headingOneLine,
     JSON.stringify(basics.heroPurpose)
   );
   record(

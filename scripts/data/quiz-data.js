@@ -145,7 +145,7 @@
       answer: 1,
       explanation: "Lag Displacement RollはPlane of Motionから外れて位置をずらし、In-close Overshootを避ける余裕を作る考え方です。",
       href: "#offensive-overshoot",
-      section: "Overshoot管理"
+      section: "Lag Displacement Roll"
     },
     {
       question: "攻撃側にとってScissorsをどう捉えるのが適切ですか？",

@@ -839,9 +839,8 @@
 }
 
 .hero-definition {
-  display: grid;
-  max-width: 68ch;
-  gap: 0.65rem;
+  display: block;
+  max-width: none;
   margin: 0 0 1rem;
   color: var(--text);
   font-size: var(--type-lead);
@@ -850,5 +849,9 @@
 }
 
 .hero-definition > span {
-  display: block;
+  display: inline;
+}
+
+.hero-definition > span + span::before {
+  content: " ";
 }

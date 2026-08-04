@@ -492,6 +492,20 @@
       href: "offensive-bfm.html#offensive-responses"
     },
     {
+      term: "Ditch Follow",
+      ja: "運動面の変更に対する追跡の組み直し",
+      desc: "相手がNose-low側へ運動面を変えた後、Point of Departureと新しいRACを読み、移動したControl Zoneへつながるよう追跡関係を作り直す考え方。",
+      related: "Ditch / Point of Departure / control zone",
+      href: "offensive-bfm.html#offensive-responses"
+    },
+    {
+      term: "Radius Defense Follow",
+      ja: "旋回半径の変更に対する追跡の組み直し",
+      desc: "相手がEnergyを使ってTurn Radiusを小さくした後、早い飛行経路交差を避けながら新しい旋回円へ追跡関係を作り直す考え方。",
+      related: "Radius Defense / turn radius / redefinition",
+      href: "offensive-bfm.html#offensive-responses"
+    },
+    {
       term: "High-Aspect BFM",
       ja: "互いに機首を向けやすい高Aspectの関係",
       desc: "両機が高Aspectで新しいMergeへ近づく状態。以前の攻撃優位が中立化したら、EnergyとGeometryからFlowを選び直す。",

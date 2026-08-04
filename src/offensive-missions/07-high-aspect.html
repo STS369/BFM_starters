@@ -12,7 +12,7 @@
   <section class="module" data-mission-content aria-labelledby="high-aspect-title">
     <header class="module-header lesson-header">
       <div><h2 class="numbered-module-title lesson-title" id="high-aspect-title"><span class="module-title-number lesson-number">07:</span><span class="module-title-text lesson-title-text">High-Aspect BFM</span></h2></div>
-      <p class="learning-goal lesson-goal"><span>学習目標</span>攻撃優位を前提にできない関係で、Merge前の仮説を実際の動きに合わせて更新できる。</p>
+      <p class="learning-goal lesson-goal"><span>学習目標</span>相対EnergyからCircle flowの仮説を立て、上下方向の組み合わせに応じて判断を更新できる。</p>
     </header>
 
     <p class="lead-copy"><strong>High-Aspect BFM</strong>は、2機が互いの前方側に位置し、高いAspectで接近する関係を扱います。<strong>Merge</strong>は、2機が近い位置ですれ違う局面です。以前の攻撃優位を前提にできない状態を、この講座では<strong>Neutralized（中立化）</strong>と呼びます。High-Aspect BFMは変化が速く、固定された一つの展開にはなりません。<a class="source-marker" href="#offensive-ref-2" aria-label="参考資料2へ">[2]</a></p>
@@ -62,16 +62,27 @@
         <article class="content-card">
           <span class="compare-tag">ONE‑CIRCLE</span>
           <h3>一つの旋回空間を共有する</h3>
-          <p>小さいTurn Radiusと、早く機首関係を作ることが重要になりやすいFlowです。</p>
-          <p>初期Geometryと相対Energyによって、有利になる側は変わります。</p>
+          <p>小さいTurn Radiusと、早い機首方向の変化を重視するFlowです。</p>
+          <dl>
+            <div><dt>Game planにしやすい状況</dt><dd>相手の方が高Energyで、長いRate Fightを避けたい</dd></div>
+            <div><dt>自機側の強み</dt><dd>小さいTurn Radiusや低速域の扱いやすさ</dd></div>
+            <div><dt>狙う変化</dt><dd>短い時間で機首関係を作り、相手を前方へ動かす</dd></div>
+            <div><dt>注意</dt><dd>単に速度を落とすことが目的ではなく、次の機動余裕を残す</dd></div>
+          </dl>
         </article>
         <article class="content-card">
           <span class="compare-tag">TWO‑CIRCLE</span>
           <h3>別々の旋回円を作る</h3>
-          <p>持続Turn Rateと、時間をかけた角度変化が重要になりやすいFlowです。</p>
-          <p>機体特性だけでなく、開始位置と相対Energyも結果に影響します。</p>
+          <p>持続Turn Rateと、時間をかけた角度変化を重視するFlowです。</p>
+          <dl>
+            <div><dt>Game planにしやすい状況</dt><dd>自分に相対Energyの余裕があり、持続旋回へ使える</dd></div>
+            <div><dt>自機側の強み</dt><dd>高い持続Turn RateとEnergyを保つ余裕</dd></div>
+            <div><dt>狙う変化</dt><dd>旋回を続けながら、少しずつ機首方向の優位を作る</dd></div>
+            <div><dt>注意</dt><dd>空間と高度の余裕がなくなれば、Rate Fightを続けられない</dd></div>
+          </dl>
         </article>
       </div>
+      <p class="term-note">これはMerge前に置く<strong>Game plan</strong>です。実際のFlowは双方の飛行経路で決まります。相手がこちらへ旋回すればTwo‑Circle、反対側へ旋回すればOne‑Circleが形成されます。相手の選択が予想と違えば、計画を切り替えます。<a class="source-marker" href="#offensive-ref-1" aria-label="参考資料1へ">[1]</a><a class="source-marker" href="#offensive-ref-2" aria-label="参考資料2へ">[2]</a></p>
     </div>
 
     <div class="subsection">
@@ -98,6 +109,39 @@
           <p>高度余裕と、増えた速度がClosureへ与える影響を読み直します。</p>
         </article>
       </div>
+    </div>
+
+    <div class="subsection">
+      <p class="eyebrow">VERTICAL MERGE MATCHUPS</p>
+      <h3>上下方向の組み合わせを4パターンで読む</h3>
+      <p>次の4パターンは、提供テキストの考え方を初心者向けに整理したものです。高度だけで勝敗を決めず、相対Energy・Turning Room・高度余裕を合わせて読みます。</p>
+      <div class="comparison-cards two-up card-grid high-aspect-merge-matchups">
+        <article class="content-card">
+          <span class="compare-tag">BOTH NOSE‑HIGH</span>
+          <h3>双方が上へ向かう</h3>
+          <p>低い位置からMergeした側は、下から上へ使える旋回空間を確保しやすくなります。</p>
+          <dl><div><dt>起こりやすい変化</dt><dd>Energyを保てれば、先に旋回率を作って機首方向を変えやすい</dd></div><div><dt>再確認</dt><dd>上昇後の速度と、頂点を越えた後の余裕</dd></div></dl>
+        </article>
+        <article class="content-card">
+          <span class="compare-tag">BOTH NOSE‑LOW</span>
+          <h3>双方が下へ向かう</h3>
+          <p>高い位置から始めた側は、速度へ交換できる高度を多く持っています。</p>
+          <dl><div><dt>起こりやすい変化</dt><dd>高度を使いすぎなければ、2回目のMergeでEnergy優位を残しやすい</dd></div><div><dt>再確認</dt><dd>増えたClosureと、下方に残る高度余裕</dd></div></dl>
+        </article>
+        <article class="content-card">
+          <span class="compare-tag">YOU HIGH / OPPONENT LOW</span>
+          <h3>自分が上、相手が下</h3>
+          <p>上下へ分かれることで、相手とは異なるEnergy交換になります。</p>
+          <dl><div><dt>起こりやすい変化</dt><dd>自分は瞬間旋回率を作りやすく、先に機首方向の優位を得られる場合がある</dd></div><div><dt>再確認</dt><dd>相手の加速と、次のHigh-to-Low Mergeでの相対Energy</dd></div></dl>
+        </article>
+        <article class="content-card">
+          <span class="compare-tag">YOU LOW / OPPONENT HIGH</span>
+          <h3>自分が下、相手が上</h3>
+          <p>相手が上側で角度を作りやすく、自分は不利になりやすい組み合わせです。</p>
+          <dl><div><dt>優先すること</dt><dd>高度低下を増やしすぎず、使えるTurning Roomを維持する</dd></div><div><dt>再確認</dt><dd>下方の余裕と、相手が上から作る機首方向の変化</dd></div></dl>
+        </article>
+      </div>
+      <p class="term-note">ここで示すのは最初に現れやすい傾向です。機体特性、開始速度、実際の高度差、双方の旋回方向で結果は変わります。上下の選択をした後も、Circle flowと相対Energyを読み直します。<a class="source-marker" href="#offensive-ref-1" aria-label="参考資料1へ">[1]</a><a class="source-marker" href="#offensive-ref-2" aria-label="参考資料2へ">[2]</a></p>
     </div>
 
     <div class="subsection">

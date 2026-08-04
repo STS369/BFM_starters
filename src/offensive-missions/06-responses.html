@@ -12,7 +12,7 @@
   <section class="module" data-mission-content aria-labelledby="offensive-responses-title">
     <header class="module-header lesson-header">
       <div><h2 class="numbered-module-title lesson-title" id="offensive-responses-title"><span class="module-title-number lesson-number">06:</span><span class="module-title-text lesson-title-text">Defender Response</span></h2></div>
-      <p class="learning-goal lesson-goal"><span>学習目標</span>相手のRedefinitionを観察し、追従する前に何を読み直すか説明できる。</p>
+      <p class="learning-goal lesson-goal"><span>学習目標</span>Ditch FollowとRadius Defense Followを区別し、追従前に読み直す項目を説明できる。</p>
     </header>
     <p class="lead-copy">防御側は、攻撃側の追跡をそのまま受け入れるとは限りません。運動面・旋回方向・高度が変われば、Control Zoneも移ります。攻撃側は相手の経路をなぞらず、<strong>変化が始まった手掛かりと、その後のRAC</strong>を読みます。</p>
     <div class="comparison-cards three-up card-grid response-comparison">
@@ -22,13 +22,43 @@
     </div>
     <p class="term-note">DitchとRadius Defenseは提供テキストで使われる呼称です。ここでは固定された操作ではなく、相手が作る<strong>運動面の変更</strong>と<strong>旋回半径の変更</strong>として整理します。<a class="source-marker" href="#offensive-ref-1" aria-label="参考資料1へ">[1]</a></p>
     <div class="subsection">
+      <p class="eyebrow">FOLLOW OPTIONS</p>
+      <h3>防御反応に応じて追跡を組み直す</h3>
+      <p>ここでいう<strong>Follow</strong>は、相手の飛行経路をそのままなぞることではありません。Point of Departureから新しい経路を予測し、移動したControl Zoneへつながる関係を作り直すことです。</p>
+      <div class="comparison-cards two-up card-grid response-follow-comparison">
+        <article class="content-card">
+          <span class="compare-tag">DITCH FOLLOW</span>
+          <h3>運動面の変更を追う</h3>
+          <p>相手がNose-low側へ運動面を変え、Control Zoneを上方・後方へ移したときに考えます。</p>
+          <dl>
+            <div><dt>最初に見るもの</dt><dd>元の運動面を離れたPoint of Departure</dd></div>
+            <div><dt>追跡の目的</dt><dd>相手の経路をなぞらず、高度とEnergyの余裕を残して再配置する</dd></div>
+            <div><dt>期待する結果</dt><dd>ClosureとAnglesを整え、新しいControl Zoneへつなぐ</dd></div>
+            <div><dt>失敗の兆候</dt><dd>飛行経路の交差が進む、またはLagに残りすぎて機首関係を戻せない</dd></div>
+          </dl>
+        </article>
+        <article class="content-card">
+          <span class="compare-tag">RADIUS DEFENSE FOLLOW</span>
+          <h3>旋回半径の変更を追う</h3>
+          <p>相手が斜め下方向へ関係を変え、Energyを使ってTurn Radiusを小さくしたときに考えます。</p>
+          <dl>
+            <div><dt>最初に見るもの</dt><dd>旋回円が変わり始めたPoint of Redefinition</dd></div>
+            <div><dt>追跡の目的</dt><dd>早く内側へ入らず、RangeとEnergyの余裕を作って新しい旋回円へ戻る</dd></div>
+            <div><dt>期待する結果</dt><dd>安定したLOSRを保ち、後方の位置的優位を残す</dd></div>
+            <div><dt>失敗の兆候</dt><dd>早い再進入によるFlight-Path Overshoot、または離れすぎによる機会の遅れ</dd></div>
+          </dl>
+        </article>
+      </div>
+      <p class="term-note">Ditch Followは<strong>運動面の移動</strong>、Radius Defense Followは<strong>旋回半径の変化</strong>への対応です。どちらも技名だけで選ばず、Point of Departure、RAC、Energyから判断します。<a class="source-marker" href="#offensive-ref-1" aria-label="参考資料1へ">[1]</a></p>
+    </div>
+    <div class="subsection">
       <p class="eyebrow">RESPONSE LOGIC</p>
-      <h3>相手の経路ではなく、変化後の関係を追う</h3>
+      <h3>どちらのFollowでも使う4段階</h3>
       <ol class="fundamentals-path logic-flow response-questions">
-        <li><span>01</span><div><h3>OBSERVE：変化の始まりを見る</h3><p>相手が元の経路や運動面を離れ始めた手掛かりを探します。これがPoint of Departureです。</p></div></li>
-        <li><span>02</span><div><h3>PREDICT：新しい交差を予測する</h3><p>自分がそのまま進んだ場合、Range、Closure、飛行経路の交差がどう変わるかを考えます。</p></div></li>
-        <li><span>03</span><div><h3>CHOOSE：優位が残る経路を選ぶ</h3><p>相手の軌跡をなぞらず、新しい後方位置へつながるかを見ます。選択後のEnergyも確認します。</p></div></li>
-        <li><span>04</span><div><h3>OBSERVEへ戻る</h3><p>相手がさらに関係を変えたら、以前の答えを捨てます。新しいPoint of Departureから読み直します。</p></div></li>
+        <li><span>01</span><div><h3>IDENTIFY：防御反応を分ける</h3><p>主な変化が運動面ならDitch、旋回半径ならRadius Defenseとして読みます。Point of Departureも確認します。</p></div></li>
+        <li><span>02</span><div><h3>PREDICT：新しい交差を予測する</h3><p>相手をそのまま追った場合のRange、Closure、飛行経路の交差を考えます。</p></div></li>
+        <li><span>03</span><div><h3>REPOSITION：余裕を作って戻る</h3><p>相手の軌跡をなぞらず、RangeとEnergyを残して新しい旋回関係へ再配置します。</p></div></li>
+        <li><span>04</span><div><h3>REASSESS：RACを読み直す</h3><p>安定したLOSR、後方位置、Control Zoneへのつながりを確認します。関係が再び変われば01へ戻ります。</p></div></li>
       </ol>
     </div>
     <div class="comparison-cards two-up card-grid term-support-grid">

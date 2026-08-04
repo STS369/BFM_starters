@@ -416,6 +416,18 @@ async function run() {
       return number && Math.abs(parseFloat(getComputedStyle(number).fontSize) - parseFloat(getComputedStyle(item).fontSize)) < 0.5;
     }),
     heroStatsRemoved: !document.querySelector(".hero-stats"),
+    partTwoRoutesStartAtTop: [
+      [...document.querySelectorAll("#global-nav a")].find((link) => link.textContent.includes("Offensive BFM")),
+      [...document.querySelectorAll("#site-guide .part-card a")].find((link) => link.textContent.includes("Part 2")),
+      document.querySelector("#course-offensive")
+    ].every((link) => {
+      if (!link) return false;
+      const url = new URL(link.href, location.href);
+      return url.pathname.endsWith("/offensive-bfm.html") && !url.hash;
+    }),
+    naturalParagraphFlow: getComputedStyle(document.querySelector(".lead-copy")).maxWidth === "none" &&
+      [...document.querySelectorAll(".hero-definition > span")]
+        .every((span) => getComputedStyle(span).display === "inline"),
     siteGuide: (() => {
       const guide = document.querySelector("#site-guide");
       const sequences = [...document.querySelectorAll(".mission-sequence")];
@@ -901,6 +913,16 @@ async function run() {
       Boolean(basics.globalNav.offensiveRoute) &&
       new URL(basics.globalNav.offensiveRoute).pathname.endsWith("/offensive-bfm.html"),
     JSON.stringify(basics.globalNav)
+  );
+  record(
+    "Part 1のPart 2リンクはMission 01ではなくページ最上部へ移動",
+    basics.partTwoRoutesStartAtTop,
+    String(basics.partTwoRoutesStartAtTop)
+  );
+  record(
+    "本文は固定した短い行幅を使わず自然に折り返す",
+    basics.naturalParagraphFlow,
+    String(basics.naturalParagraphFlow)
   );
   record(
     "MISSION INDEXの番号はタイトルより少し大きい",
@@ -1636,6 +1658,9 @@ async function run() {
           (rect.top > rects[index - 1].top && Math.abs(rect.left - rects[index - 1].left) <= 2))
       };
     });
+    const mergeMatchupCards = [...document.querySelectorAll(
+      "#high-aspect .high-aspect-merge-matchups > .content-card"
+    )].map((card) => card.getBoundingClientRect());
 
     return {
       title: document.title,
@@ -1650,6 +1675,14 @@ async function run() {
       },
       heroBeforeMissions: Boolean(document.querySelector("#part-two-hero") && sections[0] &&
         (document.querySelector("#part-two-hero").compareDocumentPosition(sections[0]) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      overviewLearningPurpose: Boolean(
+        document.querySelectorAll("#offensive-overview .offensive-goals > .content-card").length === 3 &&
+        document.querySelectorAll("#offensive-overview .offensive-objective-flow > li").length === 4 &&
+        ["攻撃位置を読む", "位置関係を整える", "変化後の関係を読む", "Control Zone", "中立化"]
+          .every((term) => document.querySelector("#offensive-overview")?.textContent.includes(term))
+      ),
+      naturalParagraphFlow: getComputedStyle(document.querySelector(".lead-copy")).maxWidth === "none" &&
+        getComputedStyle(document.querySelector(".hero-definition")).maxWidth === "none",
       foundationContentAbsent: !document.querySelector("#welcome, #site-guide, #overview, #quiz, #glossary, #references, #next"),
       idsPresent: sections.every(Boolean),
       orderValid: sections.every((section, index) => index === 0 ||
@@ -1704,11 +1737,37 @@ async function run() {
         document.querySelector("#offensive-responses .term-support-grid") &&
         document.querySelector("#high-aspect .high-aspect-terms")
       ),
+      lagDisplacementExpanded: Boolean(
+        document.querySelector("#offensive-overshoot .module-title-text")?.textContent.trim() ===
+          "Lag Displacement Roll" &&
+        document.querySelectorAll("#offensive-overshoot .lag-displacement-terms > div").length === 3 &&
+        document.querySelectorAll("#offensive-overshoot .overshoot-response-flow > li").length === 4 &&
+        document.querySelectorAll("#offensive-overshoot .lag-displacement-checks > .content-card").length === 3
+      ),
+      defenderFollowsExpanded: Boolean(
+        document.querySelectorAll("#offensive-responses .response-follow-comparison > .content-card").length === 2 &&
+        ["Ditch Follow", "Radius Defense Follow", "Point of Redefinition", "安定したLOSR"]
+          .every((term) => document.querySelector("#offensive-responses")?.textContent.includes(term)) &&
+        document.querySelectorAll("#offensive-responses .response-questions > li").length === 4
+      ),
+      highAspectDecisionContent: [
+        "Game planにしやすい状況", "相手の方が高Energy", "自分に相対Energyの余裕",
+        "双方が上へ向かう", "双方が下へ向かう", "自分が上、相手が下",
+        "自分が下、相手が上", "2回目のMerge"
+      ].every((term) => document.querySelector("#high-aspect")?.textContent.includes(term)),
       layoutContracts: {
         entryTimingHorizontal: isHorizontalComparison("#offensive-entry .offensive-entry-flow > .turn-circle-stage", 3),
         defenderResponsesHorizontal: isHorizontalComparison("#offensive-responses .response-comparison > .content-card", 3),
+        defenderFollowsHorizontal: isHorizontalComparison("#offensive-responses .response-follow-comparison > .content-card", 2),
         circleRelationHorizontal: isHorizontalComparison("#high-aspect .high-aspect-circle-compare > .content-card", 2),
         verticalAxisHorizontal: isHorizontalComparison("#high-aspect .high-aspect-vertical-compare > .content-card", 3),
+        lagDisplacementChecksHorizontal: isHorizontalComparison("#offensive-overshoot .lag-displacement-checks > .content-card", 3),
+        mergeMatchupsTwoColumns: mergeMatchupCards.length === 4 &&
+          Math.abs(mergeMatchupCards[0].top - mergeMatchupCards[1].top) <= 2 &&
+          Math.abs(mergeMatchupCards[2].top - mergeMatchupCards[3].top) <= 2 &&
+          mergeMatchupCards[2].top > mergeMatchupCards[0].top &&
+          mergeMatchupCards[1].left > mergeMatchupCards[0].left &&
+          mergeMatchupCards[3].left > mergeMatchupCards[2].left,
         logicalFlows
       },
       operationalValuesAbsent: ["7.5 g", "12 units", "10,000 ft", "maximum afterburner"]
@@ -1768,6 +1827,16 @@ async function run() {
     JSON.stringify(offensive)
   );
   record(
+    "Part 2冒頭で学ぶ内容と目指す状態を区別して説明",
+    offensive.overviewLearningPurpose,
+    String(offensive.overviewLearningPurpose)
+  );
+  record(
+    "Part 2本文も利用可能な横幅で自然に折り返す",
+    offensive.naturalParagraphFlow,
+    String(offensive.naturalParagraphFlow)
+  );
+  record(
     "Part 2固有のSEOとcanonicalを設定",
     offensive.seo.description.includes("Offensive BFM") &&
       offensive.seo.canonical === "https://bfm-starters.netlify.app/offensive-bfm.html" &&
@@ -1810,6 +1879,7 @@ async function run() {
       offensive.layoutContracts.defenderResponsesHorizontal &&
       offensive.layoutContracts.circleRelationHorizontal &&
       offensive.layoutContracts.verticalAxisHorizontal &&
+      offensive.layoutContracts.mergeMatchupsTwoColumns &&
       offensive.layoutContracts.logicalFlows.length >= 5 &&
       offensive.layoutContracts.logicalFlows.every((flow) => flow.vertical),
     JSON.stringify(offensive.layoutContracts)
@@ -1821,6 +1891,27 @@ async function run() {
       supplementalTermsPresent: offensive.supplementalTermsPresent,
       termDefinitionsPresent: offensive.termDefinitionsPresent
     })
+  );
+  record(
+    "Lag Displacement Rollを独立したMission内容として説明",
+    offensive.lagDisplacementExpanded && offensive.layoutContracts.lagDisplacementChecksHorizontal,
+    JSON.stringify({
+      expanded: offensive.lagDisplacementExpanded,
+      checksHorizontal: offensive.layoutContracts.lagDisplacementChecksHorizontal
+    })
+  );
+  record(
+    "Ditch FollowとRadius Defense Followを比較して説明",
+    offensive.defenderFollowsExpanded && offensive.layoutContracts.defenderFollowsHorizontal,
+    JSON.stringify({
+      expanded: offensive.defenderFollowsExpanded,
+      horizontal: offensive.layoutContracts.defenderFollowsHorizontal
+    })
+  );
+  record(
+    "High-Aspect MergeのCircle選択と上下4パターンを説明",
+    offensive.highAspectDecisionContent,
+    String(offensive.highAspectDecisionContent)
   );
   record(
     "Part 2の出典付き公開画像が4点",

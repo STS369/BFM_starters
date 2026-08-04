@@ -1740,7 +1740,7 @@ blockquote {
 }
 
 .footer-about > p {
-  max-width: 72ch;
+  max-width: none;
   margin: 0;
   color: var(--muted);
   font-size: 0.72rem;
@@ -1787,7 +1787,7 @@ blockquote {
 .lesson-header { margin-bottom: clamp(1.8rem, 3vw, 2.4rem); }
 .lesson-goal { padding: 0 0 0 0.9rem; background: none; }
 .lesson-goal span { display: inline; margin-right: 0.6rem; }
-.lead-copy { max-width: 68ch; }
+.lead-copy { max-width: none; }
 .part-card,
 .principle-card { min-height: 0; }
 .principle-card h3,
@@ -2200,7 +2200,7 @@ blockquote {
 }
 
 .course-completion p {
-  max-width: 68ch;
+  max-width: none;
   margin: 0;
   color: var(--text-soft);
   font-size: var(--type-body);

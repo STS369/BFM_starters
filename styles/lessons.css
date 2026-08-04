@@ -1850,6 +1850,17 @@ blockquote {
 
 .reference-figure-wide { width: min(100%, 780px); margin: 2rem auto; }
 
+.reference-figure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.reference-figure-grid .reference-figure {
+  min-width: 0;
+}
+
 .reference-image-canvas {
   display: grid;
   min-height: 250px;
@@ -2000,6 +2011,25 @@ blockquote {
   margin: var(--space-5) 0;
 }
 
+/* Entry timings are alternatives to compare, not a step-by-step sequence. */
+.offensive-entry-flow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.offensive-entry-flow .turn-circle-stage {
+  min-width: 0;
+}
+
+.offensive-entry-flow .turn-circle-stage + .turn-circle-stage::before {
+  display: none;
+}
+
+.offensive-entry-flow .turn-circle-stage-header {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
 .turn-circle-stage {
   position: relative;
   padding: clamp(1rem, 2.5vw, 1.5rem);
@@ -2073,6 +2103,7 @@ blockquote {
 .comparison-cards { display: grid; gap: 0.75rem; margin: 1.5rem 0; }
 .comparison-cards.three-up { grid-template-columns: repeat(3, 1fr); }
 .comparison-cards.two-up { grid-template-columns: repeat(2, 1fr); }
+.comparison-cards.four-up { grid-template-columns: repeat(4, 1fr); }
 .comparison-cards > article { min-width: 0; padding: clamp(1rem, 2.2vw, 1.35rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 .comparison-cards h3 { margin: 0.35rem 0 0.7rem; font-size: 1rem; }
 .comparison-cards article > p:not(.term-en):not(.term-ja) { color: var(--muted); font-size: 0.75rem; line-height: 1.7; }
@@ -2137,6 +2168,12 @@ blockquote {
   color: var(--muted);
   font-size: var(--type-small);
   line-height: 1.75;
+}
+
+/* Procedures and cause-and-effect relationships read from top to bottom. */
+.fundamentals-path.logic-flow,
+.zone-reading-order.logic-flow {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .concept-columns.geometry-concepts {

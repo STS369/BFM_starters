@@ -106,5 +106,73 @@
     }
   ];
 
+  const offensiveQuizData = [
+    {
+      question: "Offensive BFMで最も重視する考え方はどれですか？",
+      options: ["技を決めた順番で最後まで続ける", "Range・Angles・Closureを整え、攻撃優位を維持する", "常に最短距離だけを選ぶ", "速度を一定に保つ"],
+      answer: 1,
+      explanation: "Offensive BFMは技の固定手順ではありません。RACを整えて機会を作り、選択後も優位が残るかを読み続けます。",
+      href: "#offensive-overview",
+      section: "Offensive BFMとは"
+    },
+    {
+      question: "Turn Circleへ早すぎるタイミングで入る主な問題はどれですか？",
+      options: ["必ず距離が離れる", "Flight-Path Overshootと相手の反転機会を招きやすい", "Turning Roomが無限に増える", "Closureが必ずゼロになる"],
+      answer: 1,
+      explanation: "早すぎる進入は距離とClosureの余裕を失い、相手へReversal opportunityを渡しやすくなります。",
+      href: "#offensive-entry",
+      section: "Attack Window"
+    },
+    {
+      question: "High Yo-Yoを考える状況として最も適切なのはどれですか？",
+      options: ["Closureが大きくOvershootが進みつつある", "距離が離れ続けて近づけない", "相手を見失った", "高度を必ず失いたい"],
+      answer: 0,
+      explanation: "High Yo-Yoは速度を高度へ移し、Closureを抑えて後方関係を作り直す方向の調整です。",
+      href: "#offensive-yoyos",
+      section: "High / Low Yo-Yo"
+    },
+    {
+      question: "Low Yo-Yoの主なEnergy tradeはどれですか？",
+      options: ["速度を高度へ移す", "高度を速度へ移す", "Rangeを高度へ移す", "Anglesを燃料へ移す"],
+      answer: 1,
+      explanation: "Low Yo-Yoは高度を速度へ移し、Lagに残りすぎた距離を詰める方向の調整です。",
+      href: "#offensive-yoyos",
+      section: "High / Low Yo-Yo"
+    },
+    {
+      question: "Lag Displacement Rollの説明として適切なのはどれですか？",
+      options: ["相手の飛行経路を正確になぞる", "旋回面をずらしてClosureと後方位置を作り直す", "常にLead Pursuitを強める", "High-Aspectへ必ず移行する"],
+      answer: 1,
+      explanation: "Lag Displacement RollはPlane of Motionから外れて位置をずらし、In-close Overshootを避ける余裕を作る考え方です。",
+      href: "#offensive-overshoot",
+      section: "Overshoot管理"
+    },
+    {
+      question: "攻撃側にとってScissorsをどう捉えるのが適切ですか？",
+      options: ["最初から積極的に目指す状態", "攻撃優位が崩れ、役割逆転の危険がある状態", "必ずTwo‑Circleになる状態", "速度だけで勝敗が決まる状態"],
+      answer: 1,
+      explanation: "ScissorsはOvershootと反転から生じる低速の関係で、攻撃優位が不安定になった警告として読みます。",
+      href: "#offensive-overshoot",
+      section: "Overshoot管理"
+    },
+    {
+      question: "相手のRedefinitionを認識した直後に行うべきことはどれですか？",
+      options: ["以前の追跡をそのまま続ける", "Departure pointとRAC、Energyを読み直す", "相手と同じ運動面へ必ず入る", "One‑Circleを固定する"],
+      answer: 1,
+      explanation: "運動面や旋回関係が変わると、以前の追跡判断は前提を失います。変化後の関係を再評価します。",
+      href: "#offensive-responses",
+      section: "Defender Response"
+    },
+    {
+      question: "攻撃優位が中立化してHigh-Aspectへ移ったときの考え方はどれですか？",
+      options: ["攻撃側だった前提を維持する", "Energy・Geometry・Turning Room・高度余裕からFlowを選び直す", "機体名だけでOne／Two‑Circleを決める", "必ずNose-lowを選ぶ"],
+      answer: 1,
+      explanation: "中立化後は以前の役割を捨て、現在のEnergy・Geometry・Turning Room・高度余裕から新しいFlowを考えます。",
+      href: "#high-aspect",
+      section: "High-Aspect BFM"
+    }
+  ];
+
   window.BFM.quizData = quizData;
+  window.BFM.offensiveQuizData = offensiveQuizData;
 })();

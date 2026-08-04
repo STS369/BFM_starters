@@ -66,42 +66,48 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 `MissionReveal` は各 `mission-sequence` の先頭に置きます。MISSION INDEXのリンク先IDと `data-section` は外側の `mission-sequence` が持ち、導入画面の直後に実際の `.module` を置きます。導入タイトルと章タイトルは同じ文言にしてください。
 
-`MissionIndex` は、旧「PART 01 ACTIVE」と同じヘッダー右端に単独の「目次」として配置したネイティブな `details` です。開くと18章の名前とページ進捗を表示し、項目選択で対応する `mission-sequence` へ移動します。左固定カラムとスプリッターは使用しません。JavaScriptは現在項目の強調、選択後・外側クリック・Escapeでの閉じる動作を補助します。
+`MissionIndex` は、旧「PART 01 ACTIVE」と同じヘッダー右端に単独の「目次」として配置したネイティブな `details` です。Part 1では18章、Part 2では11章のページ内項目だけを表示し、項目選択で同じページの `mission-sequence` へ移動します。左固定カラムとスプリッターは使用しません。JavaScriptは現在項目の強調、選択後・外側クリック・Escapeでの閉じる動作を補助します。
+
+`Quiz` はPart 1とPart 2の確認問題を同じ実装で管理します。`scripts/data/quiz-data.js`の`quizData`と`offensiveQuizData`を、`scripts/components/quiz.js`の`quizConfigs`でそれぞれのDOM ID・得点境界・修了リンクへ対応させます。現在のページに存在しないクイズ設定は何もせず終了し、入力名と状態はPartごとに分離します。
 
 ## HTMLコンポーネントと生成
 
-公開ページは単一ページのまま、`index.html` を表示枠だけにして、本文を生成済みJavaScriptから組み立てます。編集用ソースは次の単位へ分割しています。
+公開ページはPartごとに分け、`index.html` と `offensive-bfm.html` を短い表示枠だけにして、本文をページ別の生成済みJavaScriptから組み立てます。編集用ソースは次の単位へ分割しています。
 
-- `src/index.template.html` — head、表示先、JavaScriptの読み込み順
-- `src/app.template.html` — ページ本文の外枠とHTML部品の読み込み順
-- `src/partials/` — Header、WelcomeSequence、Hero、MissionIndex、Footer
-- `src/missions/` — MISSION 01〜18の導入画面と本文
+- `src/index.template.html` — Part 1のhead、表示先、JavaScriptの読み込み順
+- `src/offensive.template.html` — Part 2のhead、表示先、JavaScriptの読み込み順
+- `src/app.template.html` — Part 1本文の外枠とHTML部品の読み込み順
+- `src/offensive-app.template.html` — Part 2本文の外枠とHTML部品の読み込み順
+- `src/partials/` — ページ別Header・Hero・MissionIndexと、共通Footer・SiteAbout
+- `src/missions/` — Part 1 MISSION 01〜18の導入画面と本文
+- `src/offensive-missions/` — Part 2 MISSION 01〜11の導入画面と本文
 
-`src/app.template.html` の `<!-- @include missions/01-site-guide.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。展開結果は `scripts/generated-content.js` へ生成され、`scripts/content-loader.js` が既存コンポーネントの初期化前に `index.html` の表示先へ挿入します。通信によるHTML取得は行わないため、HTTP公開時とWindowsからの直接表示の両方で動作します。
+`src/app.template.html` の `<!-- @include missions/01-site-guide.html -->` や、`src/offensive-app.template.html` の `<!-- @include offensive-missions/01-overview.html -->` のような行を、`tools/build-html.mjs` が再帰的に展開します。Part 1は `scripts/generated-content.js`、Part 2は `scripts/generated-offensive-content.js` へ生成され、`scripts/content-loader.js` が各ページでコンポーネントの初期化前に本文を表示先へ挿入します。通信によるHTML取得は行わないため、HTTP公開時とWindowsからの直接表示の両方で動作します。
 
 ```powershell
 node tools/build-html.mjs
 node tools/build-html.mjs --check
 ```
 
-`index.html` と `scripts/generated-content.js` は生成物なので直接編集しません。変更は `src/` へ行い、2つの生成済みファイルもコミットします。
+`index.html`、`offensive-bfm.html`、`scripts/generated-content.js`、`scripts/generated-offensive-content.js` は生成物なので直接編集しません。変更は `src/` へ行い、4つの生成済みファイルもコミットします。
 
 ## JavaScriptコンポーネント
 
-HTML本文は編集時にファイルを分割し、公開前に `scripts/generated-content.js` へまとめます。JavaScriptが有効な環境ではHTTP公開時とWindowsからの直接表示の両方で動作します。JavaScript無効時は本文の代わりに有効化案内を表示します。操作機能は読み込み順付きの通常スクリプトへ分けます。
+HTML本文は編集時にファイルを分割し、公開前にPart 1を `scripts/generated-content.js`、Part 2を `scripts/generated-offensive-content.js` へまとめます。JavaScriptが有効な環境ではHTTP公開時とWindowsからの直接表示の両方で動作します。JavaScript無効時は本文の代わりに有効化案内を表示します。操作機能は両ページで共用し、読み込み順付きの通常スクリプトへ分けます。
 
-- `scripts/generated-content.js` — ビルドで生成する本文データ
+- `scripts/generated-content.js` — ビルドで生成するPart 1本文データ
+- `scripts/generated-offensive-content.js` — ビルドで生成するPart 2本文データ
 - `scripts/content-loader.js` — 本文を表示先へ挿入する起動前処理
 - `scripts/main.js` — 起動順を管理するエントリーポイント
 - `scripts/data/` — 確認問題と用語のデータ
 - `scripts/utils/dom.js` — DOM共通処理
 - `scripts/components/` — Menu、Progress、MissionIndex、SpeedLab、WelcomeSequence、MissionReveal、Quiz、Glossary
 
-各ファイルは `window.BFM` 名前空間へ `setup...()` を登録し、`main.js` だけが初期化します。HTMLのスクリプト順は依存関係の一部なので変更しないでください。
+各ファイルは `window.BFM` 名前空間へ `setup...()` を登録し、`main.js` だけが初期化します。各公開ページは対応する生成コンテンツだけを先頭で読み込み、その後の共通スクリプト順は同一にします。HTMLのスクリプト順は依存関係の一部なので変更しないでください。
 
 ## レスポンシブの責務
 
-モバイル向けの上書きは原則として `styles/responsive.css` に置きます。Apple風ウェルカムとMISSION導入画面に固有の幅・高さ調整だけは `styles/welcome.css` に置きます。
+モバイル向けの上書きは原則として `styles/responsive.css` に置きます。Part 1のApple風ウェルカム、両ページのMISSION導入画面に固有の幅・高さ調整だけは `styles/welcome.css` に置きます。Part 2の専用ヒーローも既存のHeroクラスとレスポンシブ規則を再利用します。
 
 | 幅 | 主な切り替え |
 |---|---|
@@ -118,5 +124,5 @@ HTML本文は編集時にファイルを分割し、公開前に `scripts/genera
 2. 既存の機能クラスは削除せず、共通クラスと組み合わせます。
 3. 9つのCSSファイルの読み込み順を維持します。
 4. 1440px、768px、430px、390px、375px、360px、320pxと `prefers-reduced-motion` を確認します。
-5. `tests/smoke.mjs` で表示、操作、本文の挿入、JavaScript無効時の案内を確認します。
-6. `node tools/build-html.mjs --check` で公開用HTMLと生成コンテンツが最新か確認します。
+5. `tests/smoke.mjs` でPart 1とPart 2の表示、目次、ページ間リンク、本文の挿入、クイズ、JavaScript無効時の案内を確認します。
+6. `node tools/build-html.mjs --check` で2つの公開用HTMLと2つの生成コンテンツが最新か確認します。

@@ -1,5 +1,5 @@
 /**
- * Mount the trusted HTML generated from src/app.template.html.
+ * Mount the trusted HTML generated for the current course page.
  * This runs before the UI components so the final DOM matches the original page.
  */
 

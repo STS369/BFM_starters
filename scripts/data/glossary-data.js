@@ -198,6 +198,13 @@
       href: "#geometry"
     },
     {
+      term: "Line of Sight Rate (LOSR)",
+      ja: "視線方向が動く速さ",
+      desc: "視界の中で、相手機へ向く視線方向がどの向きへ、どの速さで動くかを表す見方。相手の次の位置を考える手掛かりになる。",
+      related: "line of sight / closure / flight path",
+      href: "offensive-bfm.html#offensive-geometry"
+    },
+    {
       term: "Specific Excess Power (Ps)",
       ja: "比余剰出力",
       desc: "機体がエネルギーを増やしているか、維持しているか、失っているかを見る指標。正なら増加、0付近なら維持、負なら減少を表す。",
@@ -252,6 +259,20 @@
       desc: "相手が飛行経路を越えたあとなどに、旋回方向を変えて位置関係を作り直せる可能性。発生しても自動的な逆転を意味しない。",
       related: "overshoot / range / HCA",
       href: "#overshoot"
+    },
+    {
+      term: "role reversal",
+      ja: "攻守の役割逆転",
+      desc: "追う側と追われる側の位置的な役割が入れ替わること。単なる旋回方向の変更とは分けて考える。",
+      related: "overshoot / reversal / scissors",
+      href: "offensive-bfm.html#offensive-overshoot"
+    },
+    {
+      term: "downrange travel",
+      ja: "元の進行方向へ進む距離",
+      desc: "旋回している間にも、元の進行方向へどれだけ先へ進むかを見る考え方。Scissorsでは前後位置の変化と合わせて読む。",
+      related: "Flat Scissors / flight path / energy",
+      href: "offensive-bfm.html#offensive-overshoot"
     },
     {
       term: "in-close overshoot",
@@ -331,6 +352,20 @@
       href: "#circle-fight"
     },
     {
+      term: "flow",
+      ja: "Merge後に形成される旋回の流れ",
+      desc: "双方の飛行経路によって形作られるOne‑Circle、Two‑Circle、Scissorsなどの旋回関係。片方だけでは決まらない。",
+      related: "merge / One‑Circle / Two‑Circle",
+      href: "offensive-bfm.html#high-aspect"
+    },
+    {
+      term: "lead turn",
+      ja: "すれ違う前から始める旋回",
+      desc: "利用できるTurning Roomを使い、Merge後の向きの差を小さくするため、すれ違う前から旋回を始める考え方。",
+      related: "turning room / merge / geometry",
+      href: "offensive-bfm.html#high-aspect"
+    },
+    {
       term: "nose-on / sensor nose on",
       ja: "相手へ機首またはセンサーの有効方向を向けた状態",
       desc: "相手へ機首またはセンサーの有効方向を向けられる状態。Sensor Noseの範囲は搭載システムや資料によって異なる。",
@@ -392,6 +427,83 @@
       desc: "敵機が照準位置を短時間だけ横切る機会。安定追跡ではなく、未来位置の予測が必要になる概念。",
       related: "Tracking Guns / angles",
       href: "#guns"
+    },
+    {
+      term: "Offensive BFM",
+      ja: "攻撃側の基本戦闘機動",
+      desc: "有利な位置からRange・Angles・Closureを整え、攻撃機会を作りながら優位を維持する判断。固定された技の順番ではない。",
+      related: "RAC / pursuit / control zone",
+      href: "offensive-bfm.html#offensive-overview"
+    },
+    {
+      term: "exclusive-use turning room",
+      ja: "片方だけが使える旋回空間",
+      desc: "2機の位置・高度・旋回円のずれにより、一方の機体だけが利用できるTurning Room。存在だけで優位は確定しない。",
+      related: "turning room / geometry / altitude",
+      href: "offensive-bfm.html#offensive-geometry"
+    },
+    {
+      term: "High Yo-Yo",
+      ja: "高度側を使う接近調整",
+      desc: "速度を高度へ移し、Closureを抑えながら相手の後方関係を作り直すOut‑of‑planeの調整。",
+      related: "closure / lag pursuit / energy trade",
+      href: "offensive-bfm.html#offensive-yoyos"
+    },
+    {
+      term: "Low Yo-Yo",
+      ja: "低高度側を使う接近調整",
+      desc: "高度を速度へ移し、Lag側に残りすぎたRangeを詰めるOut‑of‑planeの調整。Overshootと高度損失に注意する。",
+      related: "range / lead pursuit / energy trade",
+      href: "offensive-bfm.html#offensive-yoyos"
+    },
+    {
+      term: "Lag Displacement Roll",
+      ja: "後方へ位置をずらすロール",
+      desc: "相手のPlane of Motionから外れて位置をずらし、Closureを抑えて後方関係を作り直す機動概念。",
+      related: "in-close overshoot / lag pursuit / plane of motion",
+      href: "offensive-bfm.html#offensive-overshoot"
+    },
+    {
+      term: "Flat Scissors",
+      ja: "同一面内で続く反転関係",
+      desc: "2機が同じ面に近い状態で、飛行経路のOvershootと反転を繰り返す関係。攻撃側には役割逆転の危険がある。",
+      related: "overshoot / reversal / downrange travel",
+      href: "offensive-bfm.html#offensive-overshoot"
+    },
+    {
+      term: "Rolling Scissors",
+      ja: "立体的に続く反転関係",
+      desc: "水平・垂直方向のOvershootが続き、2機が螺旋状の関係になる状態。相対位置とEnergyを読み続ける。",
+      related: "overshoot / vertical / energy",
+      href: "offensive-bfm.html#offensive-overshoot"
+    },
+    {
+      term: "redefinition",
+      ja: "戦いの関係が別の状態へ変わること",
+      desc: "反転や運動面の変更によって、それまでの追跡関係やCircle flowが変わること。変化後はRACを読み直す。",
+      related: "reversal / plane of motion / RAC",
+      href: "offensive-bfm.html#offensive-responses"
+    },
+    {
+      term: "Point of Departure",
+      ja: "相手が元の運動関係から離れ始めた地点",
+      desc: "相手がそれまでの運動面や旋回関係から離れ始めた位置。Redefinition後の経路を読む手がかり。",
+      related: "redefinition / flight path / closure",
+      href: "offensive-bfm.html#offensive-responses"
+    },
+    {
+      term: "High-Aspect BFM",
+      ja: "互いに機首を向けやすい高Aspectの関係",
+      desc: "両機が高Aspectで新しいMergeへ近づく状態。以前の攻撃優位が中立化したら、EnergyとGeometryからFlowを選び直す。",
+      related: "merge / One‑Circle / Two‑Circle",
+      href: "offensive-bfm.html#high-aspect"
+    },
+    {
+      term: "neutralized",
+      ja: "位置的な優位が中立化した状態",
+      desc: "どちらにも明確で安定した後方優位がなく、以前の攻守関係を前提にできない状態。",
+      related: "High-Aspect BFM / merge / role reversal",
+      href: "offensive-bfm.html#high-aspect"
     }
   ];
 

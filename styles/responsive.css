@@ -651,6 +651,7 @@
   .source-media { grid-template-columns: 1fr; }
   .source-credit { grid-column: 1; }
   .geometry-grid { grid-template-columns: 1fr; }
+  .comparison-cards.four-up { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
@@ -664,7 +665,9 @@
   .speed-choice,
   .zone-reading-order,
   .comparison-cards.three-up,
-  .comparison-cards.two-up { grid-template-columns: 1fr; }
+  .comparison-cards.two-up,
+  .comparison-cards.four-up,
+  .reference-figure-grid { grid-template-columns: 1fr; }
   .speed-choice button { min-height: 64px; text-align: left; }
   .region-facts { grid-template-columns: 1fr; }
   .relationship-strip { grid-template-columns: 1fr; }
@@ -687,9 +690,14 @@
   }
 
   .turn-circle-stage-marker {
+    display: grid;
     grid-template-columns: auto auto 1fr;
     gap: 0.45rem;
     align-items: center;
+  }
+
+  .offensive-entry-flow {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .turn-circle-stage-marker strong {

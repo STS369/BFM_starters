@@ -1,5 +1,5 @@
 /*
- * Dependency-free browser smoke test for BFM STARTER.
+ * Dependency-free browser smoke test for BFM Japan.
  *
  * Usage:
  * 1. Start Chrome with --headless=new --remote-debugging-port=9222
@@ -92,6 +92,8 @@ async function run() {
   const appTemplateSource = fs.readFileSync(path.join(projectRoot, "src", "app.template.html"), "utf8");
   const publicIndexSource = fs.readFileSync(path.join(projectRoot, "index.html"), "utf8");
   const generatedContentSource = fs.readFileSync(path.join(projectRoot, "scripts", "generated-content.js"), "utf8");
+  const robotsSource = fs.readFileSync(path.join(projectRoot, "robots.txt"), "utf8");
+  const sitemapSource = fs.readFileSync(path.join(projectRoot, "sitemap.xml"), "utf8");
   const publicIndexLines = publicIndexSource.trimEnd().split(/\r?\n/).length;
   record(
     "単一ページを18章のソースから生成",
@@ -111,6 +113,13 @@ async function run() {
       publicIndexSource.includes('scripts/content-loader.js') &&
       !publicIndexSource.includes('class="module"'),
     JSON.stringify({ lines: publicIndexLines, bytes: Buffer.byteLength(publicIndexSource) })
+  );
+  record(
+    "robots.txtとサイトマップを公開URLへ統一",
+    robotsSource.includes("Sitemap: https://bfm-starters.netlify.app/sitemap.xml") &&
+      sitemapSource.includes("<loc>https://bfm-starters.netlify.app/</loc>") &&
+      sitemapSource.includes("<lastmod>2026-08-04</lastmod>"),
+    JSON.stringify({ robots: robotsSource.trim(), sitemap: sitemapSource.replace(/\s+/g, " ").trim() })
   );
 
   const target = await createTarget();
@@ -170,6 +179,20 @@ async function run() {
     quiz: document.querySelectorAll(".quiz-card").length,
     glossary: document.querySelectorAll(".glossary-card").length,
     js: document.documentElement.classList.contains("js-enabled"),
+    seo: (() => {
+      const structuredData = [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((element) => JSON.parse(element.textContent))
+        .find((data) => data["@type"] === "WebSite");
+      return {
+        description: document.querySelector('meta[name="description"]')?.content || "",
+        robots: document.querySelector('meta[name="robots"]')?.content || "",
+        canonical: document.querySelector('link[rel="canonical"]')?.href || "",
+        ogUrl: document.querySelector('meta[property="og:url"]')?.content || "",
+        ogSiteName: document.querySelector('meta[property="og:site_name"]')?.content || "",
+        ogImage: document.querySelector('meta[property="og:image"]')?.content || "",
+        structuredData
+      };
+    })(),
     heroPurpose: (() => {
       const heading = document.querySelector("#hero-title")?.textContent.trim() || "";
       const copy = document.querySelector(".hero-copy")?.innerText.trim() || "";
@@ -506,7 +529,28 @@ async function run() {
         .flatMap((attribute) => (element.getAttribute(attribute) || "").split(/\\s+/).filter(Boolean)))
       .filter((id) => !document.getElementById(id))
   }))()`);
-  record("日本語タイトル", basics.title.includes("BFM STARTER"), basics.title);
+  record(
+    "検索内容が伝わる日本語タイトル",
+    basics.title.includes("BFM Japan") && basics.title.includes("Basic Fighter Maneuvers") &&
+      basics.title.includes("ドッグファイト") && basics.title.includes("初心者"),
+    basics.title
+  );
+  record(
+    "検索向けメタデータとサイト名を統一",
+    basics.seo.description.includes("BFM Japan") &&
+      basics.seo.description.includes("Basic Fighter Maneuvers") &&
+      basics.seo.description.includes("初心者") &&
+      basics.seo.robots.includes("index") && basics.seo.robots.includes("follow") &&
+      basics.seo.robots.includes("max-image-preview:large") &&
+      basics.seo.canonical === "https://bfm-starters.netlify.app/" &&
+      basics.seo.ogUrl === "https://bfm-starters.netlify.app/" &&
+      basics.seo.ogSiteName === "BFM Japan" &&
+      basics.seo.ogImage === "https://bfm-starters.netlify.app/assets/og-bfm.svg" &&
+      basics.seo.structuredData?.name === "BFM Japan" &&
+      basics.seo.structuredData?.url === "https://bfm-starters.netlify.app/" &&
+      basics.seo.structuredData?.inLanguage === "ja",
+    JSON.stringify(basics.seo)
+  );
   record("lang=ja", basics.lang === "ja", basics.lang);
   record("H1が1つ", basics.h1 === 1, basics.h1);
   record("学習モジュールが揃う", basics.modules >= 15, basics.modules);
@@ -523,7 +567,7 @@ async function run() {
     "PART 1の前にスクロール連動ウェルカムを表示",
     basics.welcomeSequence.beforePart1 && basics.welcomeSequence.sticky && basics.welcomeSequence.heightRatio >= 1.9 &&
       basics.welcomeSequence.messages.join("|") ===
-        "ようこそBFM Starterへ|ここではドックファイトにおいて必要なBFMを学ぶことができます" &&
+        "ようこそBFM Japanへ|ここではドックファイトにおいて必要なBFMを学ぶことができます" &&
       basics.welcomeSequence.initialOpacities[0] >= 0.99 && basics.welcomeSequence.initialOpacities[1] <= 0.01,
     JSON.stringify(basics.welcomeSequence)
   );

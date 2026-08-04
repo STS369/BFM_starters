@@ -1,5 +1,5 @@
 /**
- * BFM STARTER application entry point
+ * BFM Japan application entry point
  * Uses the shared window.BFM namespace so it works over HTTP and file://.
  */
 

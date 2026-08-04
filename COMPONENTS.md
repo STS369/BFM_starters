@@ -1,4 +1,4 @@
-# BFM STARTER コンポーネントガイド
+# BFM Japan コンポーネントガイド
 
 現在の外観と静的HTMLの読みやすさを保ちながら、再利用するUIの責務を明確にするためのガイドです。既存の機能クラスはJavaScriptや後方互換のフックとして残し、共通クラスをCSSの正式なAPIとして扱います。
 
@@ -64,7 +64,7 @@ CSSは役割別に9ファイルへ分け、次の順で読み込みます。順�
 
 `WelcomeSequence`、`MissionReveal`、`TriangleFlow`、`SpeedLab`、`MissionIndex`、`Quiz`、`Glossary`、`CourseSelector` は、独立した名前と処理を維持します。
 
-`WelcomeSequence` の最初のメッセージは、スマホで不自然な位置に折り返さないよう「ようこそ」と「BFM Starterへ」を別の `span` にしています。文言を変更するときも、各行が320px幅に収まるか確認してください。
+`WelcomeSequence` の最初のメッセージは、スマホで不自然な位置に折り返さないよう「ようこそ」と「BFM Japanへ」を別の `span` にしています。文言を変更するときも、各行が320px幅に収まるか確認してください。
 
 `MissionReveal` は各 `mission-sequence` の先頭に置きます。MISSION INDEXのリンク先IDと `data-section` は外側の `mission-sequence` が持ち、導入画面の直後に実際の `.module` を置きます。導入タイトルと章タイトルは同じ文言にしてください。
 

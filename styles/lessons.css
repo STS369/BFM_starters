@@ -1963,6 +1963,83 @@ blockquote {
 .zone-reading-order b { display: block; color: var(--text); font-size: 0.8rem; }
 .zone-reading-order small { display: block; margin-top: 0.35rem; color: var(--muted); font-size: 0.66rem; line-height: 1.55; }
 
+.turn-circle-learning-flow {
+  --turn-circle-flow-gap: clamp(1rem, 2.4vw, 1.5rem);
+  display: grid;
+  gap: var(--turn-circle-flow-gap);
+  margin: var(--space-5) 0;
+}
+
+.turn-circle-stage {
+  position: relative;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(16, 38, 54, 0.78), rgba(7, 20, 30, 0.92));
+}
+
+.turn-circle-stage + .turn-circle-stage::before {
+  position: absolute;
+  top: calc(0px - var(--turn-circle-flow-gap) - 1px);
+  left: clamp(1.9rem, 4vw, 2.6rem);
+  width: 1px;
+  height: var(--turn-circle-flow-gap);
+  background: linear-gradient(var(--line), var(--cyan));
+  content: "";
+}
+
+.turn-circle-stage-header {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.28fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  align-items: end;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.turn-circle-stage-marker {
+  display: block;
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.turn-circle-stage-marker span,
+.turn-circle-stage-marker small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--type-label);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.turn-circle-stage-marker strong {
+  display: block;
+  margin: 0.25rem 0;
+  color: var(--cyan);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.9;
+}
+
+.turn-circle-stage .topic-heading {
+  margin: 0;
+}
+
+.turn-circle-stage .topic-heading h3 {
+  margin: 0;
+}
+
+.turn-circle-stage .zones-copy {
+  margin-top: 1rem;
+}
+
+.turn-circle-stage .zone-reading-order {
+  margin-bottom: 1rem;
+}
+
+.turn-circle-stage > :last-child {
+  margin-bottom: 0;
+}
+
 .comparison-cards { display: grid; gap: 0.75rem; margin: 1.5rem 0; }
 .comparison-cards.three-up { grid-template-columns: repeat(3, 1fr); }
 .comparison-cards.two-up { grid-template-columns: repeat(2, 1fr); }
@@ -2033,7 +2110,7 @@ blockquote {
 }
 
 .concept-columns.geometry-concepts {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .course-selector {

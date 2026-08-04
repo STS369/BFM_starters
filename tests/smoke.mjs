@@ -480,7 +480,14 @@ async function run() {
       }),
     excludedTerms: (() => {
       const pageText = document.body.innerText.toLowerCase();
-      const terms = ["3" + "/9", ["Fog", "of", "War"].join(" "), "W" + "VR"];
+      const terms = [
+        "3" + "/9",
+        ["Fog", "of", "War"].join(" "),
+        "W" + "VR",
+        "Pad" + "lock",
+        "Look" + "out",
+        "索" + "敵"
+      ];
       return terms.filter((term) => pageText.includes(term.toLowerCase()));
     })(),
     internalLinksValid: [...document.querySelectorAll('a[href^="#"]')].every((link) => {
@@ -642,9 +649,9 @@ async function run() {
     JSON.stringify(basics.punctuationPolicy)
   );
   record(
-    "Turning Roomの2組の連番に見出しがある",
+    "Turning Roomの3組の連番に見出しがある",
     basics.turnCircleTopics.join("|") ===
-      "Turning Roomを理解する3つの基本概念|Turning Roomを判断する3つの手順",
+      "Turning Roomを理解する3つの基本概念|Turn Circle周辺を読む3つの位置概念|Turning Roomを判断する3つの手順",
     JSON.stringify(basics.turnCircleTopics)
   );
   record(
@@ -751,7 +758,93 @@ async function run() {
     ),
     JSON.stringify(basics.japaneseTypography)
   );
-  record("対象外の3項目が本文・問題・用語集にない", basics.excludedTerms.length === 0, basics.excludedTerms.join(", "));
+  record("対象外の索敵・3/9・Fog of War・WVRがない", basics.excludedTerms.length === 0, basics.excludedTerms.join(", "));
+
+  const introCoverage = await evaluate(socket, `(() => {
+    const selectors = [
+      "#energy .induced-drag-note",
+      "#energy .energy-trade-note",
+      "#geometry .geometry-concept-aot",
+      "#geometry .geometry-units",
+      "#turn-circle .turn-space-model",
+      "#turn-circle .turn-space-source-note",
+      "#overshoot .reversal-opportunity",
+      "#circle-fight .merge-bridge",
+      "#circle-fight .nose-on-note",
+      "#plane-motion .relative-plane-note"
+    ];
+    const text = selectors.map((selector) => document.querySelector(selector)?.textContent || "").join(" ");
+    const glossaryText = document.querySelector("#glossary-list")?.textContent || "";
+    return {
+      selectorsPresent: selectors.every((selector) => Boolean(document.querySelector(selector))),
+      conceptsPresent: [
+        "Induced Drag", "Energy Expenditure", "Angle Off Tail", "Turn Bubble",
+        "Control Zone", "Attack / Assessment Window", "Reversal Opportunity",
+        "Merge", "Sensor Nose On"
+      ].every((term) => (text + glossaryText).toLowerCase().includes(term.toLowerCase())),
+      glossaryCount: document.querySelectorAll(".glossary-card").length,
+      missionCount: document.querySelectorAll(".mission-sequence").length
+    };
+  })()`);
+  record(
+    "IntroBFMの不足概念を既存Missionと用語集へ追加",
+    introCoverage.selectorsPresent && introCoverage.conceptsPresent &&
+      introCoverage.glossaryCount >= 54 && introCoverage.missionCount === 18,
+    JSON.stringify(introCoverage)
+  );
+
+  const teachingOrder = await evaluate(socket, `(() => {
+    const geometryCards = [...document.querySelectorAll("#geometry .geometry-concepts > article")];
+    const geometryCardHeadings = geometryCards.map((card) => card.querySelector("h3")?.textContent || "");
+    const aotIndex = geometryCardHeadings.findIndex((heading) => heading.includes("Angle Off Tail"));
+    const ataIndex = geometryCardHeadings.findIndex((heading) => heading.includes("Antenna Train Angle"));
+    const alignmentBridge = document.querySelector("#alignment .lead-copy");
+    const alignmentCards = document.querySelector("#alignment .alignment-comparison");
+    const recap = [...document.querySelectorAll("#recap .recap-list li")].map((item) => item.textContent.trim());
+    const quizQuestions = [...document.querySelectorAll("#quiz-list legend")].map((item) => item.textContent.trim());
+    const expectedQuizTerms = [
+      "BFMの学び方", "同時に確認する3つ", "Lose sight", "瞬間旋回率と持続旋回率",
+      "Aspect AngleとHCA", "Lag Pursuit", "Closure", "Misaligned Turn Circles",
+      "One‑Circle", "Two‑Circle", "Out‑of‑plane", "Tracking GunsとSnapshot"
+    ];
+    return {
+      geometryCardsUnified: geometryCards.length === 6 &&
+        geometryCards.every((card) => card.parentElement?.classList.contains("geometry-concepts")) &&
+        new Set(geometryCards.map((card) => {
+          const style = getComputedStyle(card);
+          return [style.backgroundColor, style.paddingTop, style.paddingRight].join("|");
+        })).size === 1 &&
+        getComputedStyle(document.querySelector("#geometry .geometry-concepts"))
+          .gridTemplateColumns.trim().split(/\\s+/).length === 3,
+      aotBeforeAta: aotIndex === 4 && ataIndex === 5,
+      turnCircleStages: (() => {
+        const stages = [...document.querySelectorAll("#turn-circle .turn-circle-stage")];
+        return stages.length === 3 && stages.every((stage, index) =>
+          stage.querySelector(".turn-circle-stage-marker strong")?.textContent.trim() === String(index + 1).padStart(2, "0") &&
+          Boolean(stage.querySelector(".topic-heading"))
+        );
+      })(),
+      alignmentBridgeBeforeCards: Boolean(alignmentBridge && alignmentCards &&
+        alignmentBridge.textContent.includes("Overshoot") &&
+        (alignmentBridge.compareDocumentPosition(alignmentCards) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      circleGoalMatchesTable: (() => {
+        const goal = document.querySelector("#circle-fight .learning-goal")?.textContent || "";
+        return goal.includes("旋回空間") && !goal.includes("旋回方向");
+      })(),
+      recapOrder: recap[7]?.includes("Turning Room") && recap[8]?.includes("Lead") &&
+        recap[9]?.includes("Overshoot") && recap[10]?.includes("旋回円のずれ"),
+      quizOrder: expectedQuizTerms.every((term, index) => quizQuestions[index]?.includes(term)),
+      recap,
+      quizQuestions
+    };
+  })()`);
+  record(
+    "用語・章間接続・復習・確認問題が本文の学習順に並ぶ",
+    teachingOrder.geometryCardsUnified && teachingOrder.aotBeforeAta && teachingOrder.turnCircleStages &&
+      teachingOrder.alignmentBridgeBeforeCards &&
+      teachingOrder.circleGoalMatchesTable && teachingOrder.recapOrder && teachingOrder.quizOrder,
+    JSON.stringify(teachingOrder)
+  );
   record("JavaScript初期化", basics.js, basics.js);
   record("ページ内リンク参照先が存在", basics.internalLinksValid, basics.internalLinksValid);
   record("ラベルなしボタンがない", basics.unlabeledButtons === 0, basics.unlabeledButtons);
@@ -868,11 +961,11 @@ async function run() {
   );
   record(
     "参考情報と外部リンクは第17章へ集約",
-    references.referenceItems === 9 && references.referenceLinkCount >= 10 &&
+    references.referenceItems === 10 && references.referenceLinkCount >= 11 &&
       references.externalLinksValid && references.lessonReferencePanels === 0 &&
       references.embeddedVideos === 0 && references.markersValid &&
-      references.firstMarkerOrder.join("|") === "1|2|3|4|5" &&
-      references.referenceIds.join("|") === "ref-1|ref-2|ref-3|ref-4|ref-5|ref-6|ref-7|ref-8|ref-9",
+      references.firstMarkerOrder.join("|") === "1|2|3|4|5|6" &&
+      references.referenceIds.join("|") === "ref-1|ref-2|ref-3|ref-4|ref-5|ref-6|ref-7|ref-8|ref-9|ref-10",
     JSON.stringify(references)
   );
 
@@ -924,7 +1017,7 @@ async function run() {
   })()`);
   record("用語集の日本語検索", glossary.count >= 1 && glossary.terms.includes("closure"), JSON.stringify(glossary));
 
-  const correctAnswers = [1, 1, 2, 0, 0, 1, 1, 0, 1, 1, 1, 2];
+  const correctAnswers = [1, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, 1];
   let quizFocusRetained = false;
   for (let index = 0; index < correctAnswers.length; index += 1) {
     const focusState = await evaluate(socket, `(() => {
@@ -978,6 +1071,26 @@ async function run() {
     JSON.stringify(resetState)
   );
 
+  if (process.env.SCREENSHOT_DIR) {
+    const desktopContentTargets = [
+      ["geometry", "bfm-desktop-geometry.png"],
+      ["turn-space-model", "bfm-desktop-turn-space-model.png"]
+    ];
+    const previousScrollBehavior = await evaluate(socket, "document.documentElement.style.scrollBehavior");
+    await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
+    for (const [id, filename] of desktopContentTargets) {
+      await evaluate(socket, `(() => {
+        const section = document.querySelector("#${id}");
+        const target = section.querySelector("[data-mission-content]") || section;
+        const headerOffset = document.querySelector(".site-header").getBoundingClientRect().height + 16;
+        window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - headerOffset, left: 0 });
+      })()`);
+      await wait(100);
+      await captureScreenshot(socket, filename);
+    }
+    await evaluate(socket, `document.documentElement.style.scrollBehavior = ${JSON.stringify(previousScrollBehavior)}`);
+  }
+
   await setViewport(socket, 375, 812);
   await evaluate(socket, "window.scrollTo(0, 0)");
   await wait(100);
@@ -985,6 +1098,8 @@ async function run() {
   if (process.env.SCREENSHOT_DIR) {
     const mobileScreenshotTargets = [
       ["overview", "bfm-mobile-overview.png"],
+      ["geometry", "bfm-mobile-geometry.png"],
+      ["turn-space-model", "bfm-mobile-turn-space-model.png"],
       ["circle-fight", "bfm-mobile-circle-fight.png"],
       ["glossary", "bfm-mobile-glossary.png"],
       ["next", "bfm-mobile-next.png"]
@@ -993,7 +1108,8 @@ async function run() {
     await evaluate(socket, 'document.documentElement.style.scrollBehavior = "auto"');
     for (const [id, filename] of mobileScreenshotTargets) {
       await evaluate(socket, `(() => {
-        const target = document.querySelector("#${id}");
+        const section = document.querySelector("#${id}");
+        const target = section.querySelector("[data-mission-content]") || section;
         const headerOffset = document.querySelector(".site-header").getBoundingClientRect().height + 16;
         window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - headerOffset, left: 0 });
       })()`);

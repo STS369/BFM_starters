@@ -33,6 +33,14 @@
       section: "BFMの3原則"
     },
     {
+      question: "瞬間旋回率と持続旋回率の違いとして適切なのは？",
+      options: ["どちらも常に同じ値になる", "瞬間旋回は必ずエネルギーを増やす", "瞬間旋回はエネルギーを消費し得るが、持続旋回は速度や高度を保てる範囲を重視する", "持続旋回は機体が停止した状態を指す"],
+      answer: 2,
+      explanation: "高い瞬間旋回率は短時間に大きく向きを変えられる一方、速度や高度を失う場合があります。持続旋回率は、エネルギーを大きく減らさず保てる旋回を考えます。",
+      href: "#turn-performance",
+      section: "旋回性能とエネルギー"
+    },
+    {
       question: "Aspect AngleとHCAの違いとして正しい説明はどれですか？",
       options: ["Aspect Angleは相手機から見た自機の位置、HCAは2機の機首方位差を表す", "Aspect Angleは機首方位差、HCAは距離を表す", "どちらも接近率だけを表す", "どちらも高度差だけを表す"],
       answer: 0,
@@ -57,12 +65,12 @@
       section: "Overshoot"
     },
     {
-      question: "Two‑Circle Fightで一般に重要になりやすい性能は？",
-      options: ["小さいTurn Radiusだけ", "高い持続Turn Rate", "最大直線速度だけ", "最小高度"],
+      question: "Misaligned Turn Circlesとは、どのような状態ですか？",
+      options: ["2機が完全に停止した状態", "旋回円の中心・位置・面がずれた状態", "常に同じ円を飛ぶ状態", "2機の速度が必ず等しい状態"],
       answer: 1,
-      explanation: "Two‑Circleではそれぞれの旋回円を進み、先に機首を向ける持続旋回率が重要になりやすいです。ただし、初期位置やエネルギーなどでも結果は変わります。",
-      href: "#circle-fight",
-      section: "Two‑Circle Fight"
+      explanation: "同じ方向へ旋回していても、2機の旋回円が一致するとは限りません。中心や面のずれを認識しないと、安定した後方位置を保ちにくくなります。",
+      href: "#alignment",
+      section: "Turn Circle Alignment"
     },
     {
       question: "One‑Circle Fightで一般に重要になりやすい性能は？",
@@ -73,12 +81,12 @@
       section: "One‑Circle Fight"
     },
     {
-      question: "Misaligned Turn Circlesとは、どのような状態ですか？",
-      options: ["2機が完全に停止した状態", "旋回円の中心・位置・面がずれた状態", "常に同じ円を飛ぶ状態", "2機の速度が必ず等しい状態"],
+      question: "Two‑Circle Fightで一般に重要になりやすい性能は？",
+      options: ["小さいTurn Radiusだけ", "高い持続Turn Rate", "最大直線速度だけ", "最小高度"],
       answer: 1,
-      explanation: "同じ方向へ旋回していても、2機の旋回円が一致するとは限りません。中心や面のずれを認識しないと、安定した後方位置を保ちにくくなります。",
-      href: "#alignment",
-      section: "Turn Circle Alignment"
+      explanation: "Two‑Circleではそれぞれの旋回円を進み、先に機首を向ける持続旋回率が重要になりやすいです。ただし、初期位置やエネルギーなどでも結果は変わります。",
+      href: "#circle-fight",
+      section: "Two‑Circle Fight"
     },
     {
       question: "Out‑of‑plane Maneuveringが利用するものは？",
@@ -95,14 +103,6 @@
       explanation: "Trackingは相手を照準位置へ継続して捉えられる状態です。Snapshotは相手が照準位置を一瞬だけ横切る短い機会です。",
       href: "#guns",
       section: "射撃機会の基礎"
-    },
-    {
-      question: "瞬間旋回率と持続旋回率の違いとして適切なのは？",
-      options: ["どちらも常に同じ値になる", "瞬間旋回は必ずエネルギーを増やす", "瞬間旋回はエネルギーを消費し得るが、持続旋回は速度や高度を保てる範囲を重視する", "持続旋回は機体が停止した状態を指す"],
-      answer: 2,
-      explanation: "高い瞬間旋回率は短時間に大きく向きを変えられる一方、速度や高度を失う場合があります。持続旋回率は、エネルギーを大きく減らさず保てる旋回を考えます。",
-      href: "#turn-performance",
-      section: "旋回性能とエネルギー"
     }
   ];
 

@@ -44,6 +44,13 @@
       href: "#energy"
     },
     {
+      term: "induced drag",
+      ja: "誘導抗力",
+      desc: "揚力を生み出すことに伴って生じる抗力。旋回で大きな揚力を求めるほど増えやすい。",
+      related: "lift / angle of attack / energy",
+      href: "#energy"
+    },
+    {
       term: "thrust",
       ja: "推力",
       desc: "エンジンなどが機体を前へ進める方向に生み出す力。",
@@ -91,6 +98,13 @@
       desc: "速度と高度を、旋回や位置取りのために使う・温存する・回復する判断。",
       related: "energy state / nose position",
       href: "#principles"
+    },
+    {
+      term: "energy expenditure / energy trade",
+      ja: "エネルギーの消費・交換",
+      desc: "速度や高度として持つエネルギーを、一時的な旋回率や機首位置へ交換する考え方。資料によって表現が異なる。",
+      related: "energy state / instantaneous turn rate",
+      href: "#energy"
     },
     {
       term: "turn rate",
@@ -170,6 +184,13 @@
       href: "#geometry"
     },
     {
+      term: "Angle Off Tail (AOT)",
+      ja: "相手の尾部方向を基準にした角度",
+      desc: "相手の尾部方向を基準に自機の位置を表す語。Aspect Angleとほぼ同じ意味で使われる場合があるため、資料ごとの定義を確認する。",
+      related: "Aspect Angle / HCA / angles",
+      href: "#geometry"
+    },
+    {
       term: "Antenna Train Angle (ATA)",
       ja: "自機の機首と視線の角度",
       desc: "自機の機首方向と、相手機へ向かう視線との間の角度。相手機が機首正面からどれだけ外れて見えるかを表す。",
@@ -226,6 +247,13 @@
       href: "#overshoot"
     },
     {
+      term: "reversal opportunity",
+      ja: "旋回方向を変えて関係を作り直す機会",
+      desc: "相手が飛行経路を越えたあとなどに、旋回方向を変えて位置関係を作り直せる可能性。発生しても自動的な逆転を意味しない。",
+      related: "overshoot / range / HCA",
+      href: "#overshoot"
+    },
+    {
       term: "in-close overshoot",
       ja: "近距離オーバーシュート",
       desc: "攻撃側が近づきすぎ、有利な後方位置を通り越してしまう状態。",
@@ -261,6 +289,27 @@
       href: "#turn-circle"
     },
     {
+      term: "turn bubble",
+      ja: "現在の旋回限界を表す空間の目安",
+      desc: "現在の速度と旋回能力から考える、機体がすぐには内側へ向きを変えられない空間の目安。固定された球ではなく、状態によって変化する。",
+      related: "turn radius / energy state",
+      href: "#turn-circle"
+    },
+    {
+      term: "control zone",
+      ja: "Range・Angles・Closureを管理する後方領域",
+      desc: "相手機の後方で、距離・角度・接近率を同時に管理しやすい3次元の領域。形や基準は資料と機種によって異なる。",
+      related: "range / angles / closure",
+      href: "#turn-circle"
+    },
+    {
+      term: "attack / assessment window",
+      ja: "進入条件を評価する位置や見え方の手掛かり",
+      desc: "Control Zoneへ移る前にRange・Angles・Closureが整うかを評価する手掛かり。名称・形・判定基準は資料によって異なる。",
+      related: "control zone / relative geometry",
+      href: "#turn-circle"
+    },
+    {
       term: "extend",
       ja: "延伸する",
       desc: "一時的に相手から距離を取り、位置関係やエネルギーを整えること。状況を自動でリセットする万能手段ではない。",
@@ -272,6 +321,20 @@
       ja: "ワン・サークル戦",
       desc: "2機が1つの旋回空間を作る流れ。一般に旋回半径が重要になりやすい。",
       related: "Radius Fight / turn radius",
+      href: "#circle-fight"
+    },
+    {
+      term: "merge",
+      ja: "2機が近い位置ですれ違う局面",
+      desc: "2機が近い位置ですれ違い、その後にOne‑CircleまたはTwo‑Circleの流れが形成される局面。",
+      related: "One‑Circle / Two‑Circle",
+      href: "#circle-fight"
+    },
+    {
+      term: "nose-on / sensor nose on",
+      ja: "相手へ機首またはセンサーの有効方向を向けた状態",
+      desc: "相手へ機首またはセンサーの有効方向を向けられる状態。Sensor Noseの範囲は搭載システムや資料によって異なる。",
+      related: "turn radius / One‑Circle",
       href: "#circle-fight"
     },
     {

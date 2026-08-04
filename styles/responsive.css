@@ -698,6 +698,28 @@
   .callout-status { display: block; }
   .callout-status span { display: block; margin-bottom: 0.35rem; }
   #circle-fight table { font-size: 0.68rem; }
+
+  .turn-circle-stage-header {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    align-items: start;
+  }
+
+  .turn-circle-stage-marker {
+    grid-template-columns: auto auto 1fr;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .turn-circle-stage-marker strong {
+    grid-row: auto;
+    margin: 0;
+    font-size: var(--type-h3);
+  }
+
+  .turn-circle-stage-marker small {
+    grid-column: auto;
+  }
   #circle-fight th,
   #circle-fight td {
     padding: 0.6rem 0.35rem;
